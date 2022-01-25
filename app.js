@@ -96,6 +96,10 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Create the file and save.
   fs.writeFile(fileName, xmlData2, 'utf-8', (err) => {
-    console.log('Successful! ' + err)
+    if(err){
+      console.log('NOT SUCCESSFUL: ERROR - ' + err)
+      return
+    }
+    console.log('Successful! ')
   })
 })
