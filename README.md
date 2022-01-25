@@ -4,6 +4,14 @@ This program is designed to change errors in the XML Batch file,  It is designed
 
 This utility was designed to help cleanup the XML file produced by PowerSchool SIS
 
+## To Install
+
+Using NODE.JS and NPM, make sure you are in the folder of the program.
+
+```bash
+npm install
+```
+
 ## To run
 
 Download the file in a known folder using the default filename from powerschool and update the code with the folder location.  You will have to update the school BSID number and the OnSIS period.
