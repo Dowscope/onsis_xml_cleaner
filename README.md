@@ -4,6 +4,8 @@ This program is designed to change errors in the XML Batch file,  It is designed
 
 This utility was designed to help cleanup the XML file produced by PowerSchool SIS
 
+This program requires NODE.JS and NPM to be installed and working before downloading this repo.
+
 ## To Install
 
 Using NODE.JS and NPM, make sure you are in the folder of the program.
@@ -22,4 +24,4 @@ Using NODE.JS run
 node app.js
 ```
 
-It will output the cleaned file in the same folder.
+It will output the cleaned file in the same folder and the one you downloaded to.
