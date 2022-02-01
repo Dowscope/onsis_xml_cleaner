@@ -6,7 +6,7 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // Where the file is located and filename.
-const school_bsid = '530344'
+const school_bsid = '415553'
 const onsis_period = 'OCTELEM3_20211031_'
 const fileLoc = '/home/smooth/Work/OnSIS/batch/'
 const file_name = 'ONSIS_' + onsis_period + school_bsid + '.xml' 
@@ -34,6 +34,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var iprc_date_counter = 0
   var placement_type_counter = 0
   var enrollment_end_date_counter = 0
+  var self_id_counter = 0
 
   // Loop through the students
   for (s in students){
@@ -42,6 +43,16 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     // Get all the keys in the Student enrollemnt sections
     for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
       
+      // Correc the error that this should be blank.
+      if (key == 'INDIGENOUS_SELF_IDENTIFICATION'){
+        if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION).length > 0){
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text == 'Non'){
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text = ''
+            self_id_counter += 1
+          }
+        }
+      }
+
       // make sure that dates before July are corrected to July 1st.
       if (key == 'ENROLMENT_END_DATE') {
         if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
@@ -87,6 +98,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('IPRC DATE Records Changed: ' + iprc_date_counter)
   console.log('Placement Type Records Changed: ' + placement_type_counter)
   console.log('Enrollment End Dates Fixed: ' + enrollment_end_date_counter)
+  console.log('Self ID\'s changed: ' + self_id_counter)
 
   // Convert the JSON to a string 
   jsonStr = JSON.stringify(jsonData)
