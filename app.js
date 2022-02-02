@@ -6,9 +6,9 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // Where the file is located and filename.
-const school_bsid = '415553'
+const school_bsid = '198587'
 const onsis_period = 'OCTELEM3_20211031_'
-const fileLoc = '/home/smooth/Work/OnSIS/batch/'
+const fileLoc = 'C:\\batch\\'
 const file_name = 'ONSIS_' + onsis_period + school_bsid + '.xml' 
 const filePath = fileLoc + file_name
 
