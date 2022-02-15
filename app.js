@@ -4,12 +4,15 @@
 // Required Files
 const xmljs = require('xml-js')
 const fs = require('fs')
-const { Console } = require('console')
+
+// School and Period Information
+const school_bsid = '509566'
+const onsis_p = 'OCTELEM3'
+const onsis_year = '_20211031_'
+const onsis_period = onsis_p + onsis_year
 
 // Where the file is located and filename.
-const school_bsid = '952087'
-const onsis_period = 'OCTSEC1_20211031_'
-const fileLoc = '/home/smooth/Work/OnSIS/batch/'
+const fileLoc = 'C:\\batch\\'
 const file_name = 'ONSIS_' + onsis_period + school_bsid + '.xml' 
 const filePath = fileLoc + file_name
 
@@ -33,6 +36,22 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const report_period = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SUBMISSION_PERIOD_TYPE._text
   const school_number = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_NUMBER._text
   const fileName = fileLoc + report_year + "_" + report_period + "_" + school_number + ".xml"
+
+  // If this is the October Submissionremove some tags.
+  if (onsis_p == 'OCTELEM3'){
+    if (jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_AVG_REPORT_CARD_GRADE && Object.keys(jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_AVG_REPORT_CARD_GRADE).length > 0){
+      delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_AVG_REPORT_CARD_GRADE
+    }
+
+    if (jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_MEDIAN_REPORT_CARD_GRADE && Object.keys(jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_MEDIAN_REPORT_CARD_GRADE).length > 0){
+      delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_MEDIAN_REPORT_CARD_GRADE
+    }
+
+    if (jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_REPORT_CARD && Object.keys(jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_REPORT_CARD).length > 0){
+      delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_REPORT_CARD
+    }
+  }
+
 
   // Count how many records are being changed
   var exception_counter = 0
