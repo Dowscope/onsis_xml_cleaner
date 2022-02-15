@@ -7,15 +7,19 @@ const fs = require('fs')
 const { Console } = require('console')
 
 // Where the file is located and filename.
-const school_bsid = '409618'
-const onsis_period = 'OCTELEM3_20211031_'
-const fileLoc = 'C:\\batch\\'
+const school_bsid = '952087'
+const onsis_period = 'OCTSEC1_20211031_'
+const fileLoc = '/home/smooth/Work/OnSIS/batch/'
 const file_name = 'ONSIS_' + onsis_period + school_bsid + '.xml' 
 const filePath = fileLoc + file_name
 
 // Open the file
 fs.readFile(filePath, 'utf-8', (err, data)=> {
-  if (err) return
+  if (err) {
+    console.log(err)
+    return
+  } 
+    
   
   // Convert the XML file to JSON for easier access
   const xmlData = xmljs.xml2json(data, {compact: true,spaces: 2})
