@@ -6,7 +6,7 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // School and Period Information
-const school_bsid = '509566'
+const school_bsid = '011517'
 const onsis_p = 'OCTELEM3'
 const onsis_year = '_20211031_'
 const onsis_period = onsis_p + onsis_year
@@ -37,7 +37,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const school_number = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_NUMBER._text
   const fileName = fileLoc + report_year + "_" + report_period + "_" + school_number + ".xml"
 
-  // If this is the October Submissionremove some tags.
+  // If this is the October Submissionremove some tags. ** This may be a future issue **
   // if (onsis_p == 'OCTELEM3'){
   //   if (jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_AVG_REPORT_CARD_GRADE && Object.keys(jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_AVG_REPORT_CARD_GRADE).length > 0){
   //     delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_AVG_REPORT_CARD_GRADE
@@ -155,6 +155,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   }
 
   // Display the number of records that were changed
+  console.log('School Numner: ' + school_bsid)
   console.log('NONEXC Records Changed: ' + exception_counter)
   console.log('IPRC DATE Records Changed: ' + iprc_date_counter)
   console.log('Placement Type Records Changed: ' + placement_type_counter)

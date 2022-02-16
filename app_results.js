@@ -6,8 +6,8 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // Where the file is located and filename.
-const fileLoc = '/home/smooth/Work/OnSIS/results/'
-const file_name = 'west.xml.OUT' 
+const fileLoc = 'c:\\results\\'
+const file_name = 'algo.OUT' 
 const filePath = fileLoc + file_name
 
  
@@ -410,11 +410,14 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Loop through the educators
   for (e in educators){
-    const id = educators[e].MEN
+    var id = 'MISSING'
+    if (Object.keys(educators[e].MEN).length > 0){
+      id = educators[e].MEN._text
+    }
     if (Array.isArray(educators[e].DATA_ERROR_DETAILS)){
       for (er in educators[e].DATA_ERROR_DETAILS){
         if (Object.keys(educators[e].DATA_ERROR_DETAILS[er]).length > 0){
-          const rows = printError(id, students[s].DATA_ERROR_DETAILS[er], null)
+          const rows = printError(id, educators[e].DATA_ERROR_DETAILS[er], null)
           for (r in rows){
             results.push(rows[r])
           }
@@ -423,7 +426,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
     if (Object.keys(educators[e].DATA_ERROR_DETAILS).length > 0){
-      const rows = printError(id, students[s].DATA_ERROR_DETAILS, null)
+      const rows = printError(id, educators[e].DATA_ERROR_DETAILS, null)
       for (r in rows){
         results.push(rows[r])
       }
