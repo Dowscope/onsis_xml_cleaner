@@ -6,8 +6,8 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // School and Period Information
-const school_bsid = '011517'
-const onsis_p = 'OCTELEM3'
+const school_bsid = '950848'
+const onsis_p = 'OCTSEC1'     // OCTELEM3 - Elementary | OCTSEC1 - Secondary
 const onsis_year = '_20211031_'
 const onsis_period = onsis_p + onsis_year
 
@@ -59,10 +59,19 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var placement_type_counter = 0
   var enrollment_end_date_counter = 0
   var self_id_counter = 0
+  var student_manual_counter = 0
 
   // Loop through the students
   for (s in students){
 
+    // Manual Changes Here
+    // const student_fixes = ['359097382', '359104171', '359106341', '359116274', '359117751', '359117769', '359117842']
+    // for (student_number in student_fixes){
+    //   if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_fixes[student_number]){
+    //     jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE._text = '38'
+    //     student_manual_counter += 1
+    //   }
+    // }
     
     // Get all the keys in the Student enrollemnt sections
     for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
@@ -161,6 +170,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('Placement Type Records Changed: ' + placement_type_counter)
   console.log('Enrollment End Dates Fixed: ' + enrollment_end_date_counter)
   console.log('Self ID\'s changed: ' + self_id_counter)
+  console.log('Student Manual Fixes: ' + student_manual_counter)
 
   // Convert the JSON to a string 
   jsonStr = JSON.stringify(jsonData)

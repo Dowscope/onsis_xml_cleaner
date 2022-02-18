@@ -6,8 +6,8 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // Where the file is located and filename.
-const fileLoc = 'c:\\results\\'
-const file_name = 'algo.OUT' 
+const fileLoc = 'h:\\1-onsis\\results\\'
+const file_name = 'virsec.OUT' 
 const filePath = fileLoc + file_name
 
  

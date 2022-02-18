@@ -1,7 +1,7 @@
 
 const fs = require('fs')
 
-const school_code = 'NORW'
+const school_code = 'sgve'
 const submission_period = 'OCT'
 const folder_path = 'c:\\reports\\' + school_code + '\\'
 const output_path = 'c:\\reports\\'
