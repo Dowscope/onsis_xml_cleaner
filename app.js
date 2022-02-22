@@ -6,7 +6,7 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // School and Period Information
-const school_bsid = '950848'
+const school_bsid = '915424'
 const onsis_p = 'OCTSEC1'     // OCTELEM3 - Elementary | OCTSEC1 - Secondary
 const onsis_year = '_20211031_'
 const onsis_period = onsis_p + onsis_year
@@ -66,6 +66,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
     // Manual Changes Here
     // const student_fixes = ['359097382', '359104171', '359106341', '359116274', '359117751', '359117769', '359117842']
+
     // for (student_number in student_fixes){
     //   if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_fixes[student_number]){
     //     jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE._text = '38'

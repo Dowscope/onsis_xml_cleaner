@@ -6,14 +6,15 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // Where the file is located and filename.
-const fileLoc = 'h:\\1-onsis\\results\\'
-const file_name = 'virsec.OUT' 
+// const fileLoc = 'h:\\1-onsis\\results\\'
+const fileLoc = 'c:\\results\\'
+const file_name = 'hamm.OUT' 
 const filePath = fileLoc + file_name
 
  
 
 // Function to print Errors and return a row
-function printError(id, error, crs_code){
+function printError(id, section, error, crs_code){
   var new_rows = []
   if (Object.keys(error).length < 1) {
     return new_rows
@@ -39,6 +40,7 @@ function printError(id, error, crs_code){
       }
       if (error.ERROR[e].E_MESSAGE._text != 'Parent entry in error'){
         // console.log('ID: ' + id)
+        row.push(section)
         row.push(id)
         
         row.push(fieldName)
@@ -69,6 +71,7 @@ function printError(id, error, crs_code){
     var row = []
     if (error.ERROR.E_MESSAGE._text != 'Parent entry in error'){
       // console.log('ID: ' + id)
+      row.push(section)
       row.push(id)
       row.push(fieldName)
       row.push(fieldValue)
@@ -123,7 +126,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Loop through the classes
   for (c in classes) {
     if (Object.keys(classes[c].DATA_ERROR_DETAILS).length > 0){
-      const rows_c = printError('N/A', classes[c].DATA_ERROR_DETAILS, null)
+      const rows_c = printError('N/A', 'Classes Error', classes[c].DATA_ERROR_DETAILS, null)
       for (r in rows_c){
         results.push(rows_c[r])
       }
@@ -134,7 +137,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (Array.isArray(classes[c].SEGMENT)){
           for (s in classes[c].SEGMENT){
             if (Object.keys(classes[c].SEGMENT[s].DATA_ERROR_DETAILS).length > 0){
-              const rows_s = printError('N/A', classes[c].SEGMENT[s].DATA_ERROR_DETAILS, null)
+              const rows_s = printError('N/A', 'Classes Segment Error', classes[c].SEGMENT[s].DATA_ERROR_DETAILS, null)
               for (r in rows_s){
                 results.push(rows_s[r])
               }
@@ -143,7 +146,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           }
         }
         else if (Object.keys(classes[c][key].DATA_ERROR_DETAILS).length > 0){
-          const rows_ss = printError(0, classes[c][key].DATA_ERROR_DETAILS, null)
+          const rows_ss = printError('N/A', 'Classes Segment Error', classes[c][key].DATA_ERROR_DETAILS, null)
           for (r in rows_ss){
             results.push(rows_ss[r])
           }
@@ -159,7 +162,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     var enrollment_errors = false
     const id = students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text
     if (Object.keys(students[s].DATA_ERROR_DETAILS).length > 0){
-      const rows_ste = printError(id, students[s].DATA_ERROR_DETAILS, null)
+      const rows_ste = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].DATA_ERROR_DETAILS, null)
       for (r in rows_ste){
         results.push(rows_ste[r])
       }
@@ -167,7 +170,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
 
     if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS).length > 0){
-      const rows_stee = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
+      const rows_stee = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
       for (r in rows_stee){
         results.push(rows_stee[r])
       }
@@ -180,7 +183,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
           for (ce in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].DATA_ERROR_DETAILS).length > 0){
-              const rows_se = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
+              const rows_se = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
               for (r in rows_se){
                 results.push(rows_se[r])
               }
@@ -191,7 +194,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               if(Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO)){
                 for (oci in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO){
                   if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO[oci]).length > 0){
-                    const rows_oci = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
+                    const rows_oci = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
                     for (r in rows_oci){
                       results.push(rows_oci[r])
                     }
@@ -201,7 +204,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
               else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO).length > 0){
                 if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO.DATA_ERROR_DETAILS).length > 0){
-                  const rows_ocii = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
+                  const rows_ocii = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
                   for (r in rows_ocii){
                     results.push(rows_ocii[r])
                   }
@@ -212,7 +215,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           }
         }
         else if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.DATA_ERROR_DETAILS && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT[key].DATA_ERROR_DETAILS).length > 0){
-          const rows_sce = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
+          const rows_sce = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
           for (r in rows_sce){
             results.push(rows_sce[r])
           }
@@ -222,7 +225,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             if(Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO)){
               for (oci in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO){
                 if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS).length > 0){
-                  const rows_scee = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
+                  const rows_scee = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
                   for (r in rows_scee){
                     results.push(rows_scee[r])
                   }
@@ -232,7 +235,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             }
             else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO).length > 0){
               if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO.DATA_ERROR_DETAILS).length > 0){
-                const rows_sceee = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
+                const rows_sceee = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
                 for (r in rows_sceee){
                   results.push(rows_sceee[r])
                 }
@@ -247,7 +250,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION)){
           for (se in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[se].DATA_ERROR_DETAILS).length > 0){
-              const rows_spe = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[se].DATA_ERROR_DETAILS, null)
+              const rows_spe = printError(id, 'SPECIAL_EDUCATION', students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[se].DATA_ERROR_DETAILS, null)
               for (r in rows_spe){
                 results.push(rows_spe[r])
               }
@@ -257,7 +260,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         }
         else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION).length > 0){
           if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.DATA_ERROR_DETAILS).length > 0){
-            const rows_spee = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.DATA_ERROR_DETAILS, null)
+            const rows_spee = printError(id, 'SPECIAL_EDUCATION', students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.DATA_ERROR_DETAILS, null)
             for (r in rows_spee){
               results.push(rows_spee[r])
             }
@@ -270,7 +273,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
           for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[slp].DATA_ERROR_DETAILS, null)
+              const rows_slp = printError(id, 'SECOND_LANGUAGE_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[slp].DATA_ERROR_DETAILS, null)
               for (r in rows_slp){
                 results.push(rows_slp[r])
               }
@@ -280,7 +283,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         }
         else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM).length > 0){
           if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.DATA_ERROR_DETAILS, null)
+            const rows_slpp = printError(id, 'SECOND_LANGUAGE_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.DATA_ERROR_DETAILS, null)
             for (r in rows_slpp){
               results.push(rows_slpp[r])
             }
@@ -293,7 +296,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR)){
           for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.PLAR){
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.PLAR[slp].DATA_ERROR_DETAILS, null)
+              const rows_slp = printError(id, 'PLAR', students[s].STUDENT_SCHOOL_ENROLMENT.PLAR[slp].DATA_ERROR_DETAILS, null)
               for (r in rows_slp){
                 results.push(rows_slp[r])
               }
@@ -303,7 +306,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         }
         else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR).length > 0){
           if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.PLAR.DATA_ERROR_DETAILS, null)
+            const rows_slpp = printError(id, 'PLAR', students[s].STUDENT_SCHOOL_ENROLMENT.PLAR.DATA_ERROR_DETAILS, null)
             for (r in rows_slpp){
               results.push(rows_slpp[r])
             }
@@ -316,7 +319,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA)){
           for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA){
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA[slp].DATA_ERROR_DETAILS, null)
+              const rows_slp = printError(id, 'DIPLOMA', students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA[slp].DATA_ERROR_DETAILS, null)
               for (r in rows_slp){
                 results.push(rows_slp[r])
               }
@@ -326,7 +329,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         }
         else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA).length > 0){
           if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA.DATA_ERROR_DETAILS, null)
+            const rows_slpp = printError(id, 'DIPLOMA', students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA.DATA_ERROR_DETAILS, null)
             for (r in rows_slpp){
               results.push(rows_slpp[r])
             }
@@ -339,7 +342,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM)){
           for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM){
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].DATA_ERROR_DETAILS, null)
+              const rows_slp = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].DATA_ERROR_DETAILS, null)
               for (r in rows_slp){
                 results.push(rows_slp[r])
               }
@@ -349,7 +352,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION)){
                 for (sc in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION){
                   if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS).length > 0){
-                    const rows_sc = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
+                    const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
                     for (r in rows_sc){
                       results.push(rows_sc[r])
                     }
@@ -359,7 +362,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
               else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION).length > 0){
                 if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION.DATA_ERROR_DETAILS).length > 0){
-                  const rows_sc = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
+                  const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
                   for (r in rows_sc){
                     results.push(rows_sc[r])
                   }
@@ -371,7 +374,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         }
         else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM).length > 0){
           if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.DATA_ERROR_DETAILS, null)
+            const rows_slpp = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.DATA_ERROR_DETAILS, null)
             for (r in rows_slpp){
               results.push(rows_slpp[r])
             }
@@ -381,7 +384,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION)){
               for (sc in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION){
                 if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS).length > 0){
-                  const rows_sc = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
+                  const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
                   for (r in rows_sc){
                     results.push(rows_sc[r])
                   }
@@ -391,7 +394,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             }
             else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION).length > 0){
               if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION.DATA_ERROR_DETAILS).length > 0){
-                const rows_sc = printError(id, students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
+                const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
                 for (r in rows_sc){
                   results.push(rows_sc[r])
                 }
@@ -417,7 +420,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     if (Array.isArray(educators[e].DATA_ERROR_DETAILS)){
       for (er in educators[e].DATA_ERROR_DETAILS){
         if (Object.keys(educators[e].DATA_ERROR_DETAILS[er]).length > 0){
-          const rows = printError(id, educators[e].DATA_ERROR_DETAILS[er], null)
+          const rows = printError(id, 'EDUCATOR ERROR', educators[e].DATA_ERROR_DETAILS[er], null)
           for (r in rows){
             results.push(rows[r])
           }
@@ -426,7 +429,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
     if (Object.keys(educators[e].DATA_ERROR_DETAILS).length > 0){
-      const rows = printError(id, educators[e].DATA_ERROR_DETAILS, null)
+      const rows = printError(id, 'EDUCATOR ERROR', educators[e].DATA_ERROR_DETAILS, null)
       for (r in rows){
         results.push(rows[r])
       }
