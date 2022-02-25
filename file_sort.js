@@ -1,7 +1,7 @@
 
 const fs = require('fs')
 
-const school_code = 'HAMM'
+const school_code = 'VALL'
 const submission_period = 'OCT'
 const folder_path = 'h:\\2-onsis\\reports\\' + school_code + '\\'
 const output_path = 'h:\\2-onsis\\reports\\'
