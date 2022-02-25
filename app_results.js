@@ -7,7 +7,7 @@ const fs = require('fs')
 
 // Where the file is located and filename.
 // const fileLoc = 'h:\\1-onsis\\results\\'
-const fileLoc = 'c:\\results\\'
+const fileLoc = 'h:\\2-onsis\\results\\'
 const file_name = 'hamm.OUT' 
 const filePath = fileLoc + file_name
 
