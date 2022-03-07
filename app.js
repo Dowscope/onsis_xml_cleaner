@@ -6,8 +6,8 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 
 // School and Period Information
-const school_bsid = '914410'
-const onsis_p = 'OCTSEC1'     // OCTELEM3 - Elementary | OCTSEC1 - Secondary
+const school_bsid = '385131'
+const onsis_p = 'OCTELEM3'     // OCTELEM3 - Elementary | OCTSEC1 - Secondary
 const onsis_year = '_20211031_'
 const onsis_period = onsis_p + onsis_year
 
@@ -30,6 +30,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Grab all the students
   const students = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT
+  const educators = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT
 
   // Set the variables for re-creating the filename
   const report_year = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.ACADEMIC_YEAR._text
@@ -61,6 +62,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var self_id_counter = 0
   var student_manual_counter = 0
   var second_language_counter = 0
+  var educator_fix_counter = 0
+  var educator_missing_men = 0
 
   // Loop through the students
   for (s in students){
@@ -107,6 +110,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       if (key == 'SPECIAL_EDUCATION'){
         if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION).length != 8){
           for( sped in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
+
             
             // Change in IPRC Date when blank
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].IPRC_STUDENT_FLAG).length > 0){
@@ -124,20 +128,42 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
             }
   
-            // If student has a certain type NONEXC then lets change it
-            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE).length > 0){
-              if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONEXC' || students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONEID'){
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text = ''
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].NON_IDENTIFIED_STUDENT_FLAG._text = 'T'
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].MAIN_EXCEPTIONALITY_FLAG._text = 'F'
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].IPRC_STUDENT_FLAG._text = 'F'
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].IPRC_REVIEW_DATE = {}
+            // If student has a certain type NONEXC or NONIND then lets change it
+            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE).length >= 0){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE).length == 0){
+                delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+                delete students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+
+                // var tempArry = [];
+                // for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION) {
+                //   i && tempArry.push(i);
+                // }
+                // jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION = tempArry;
+
+                exception_counter += 1 
+              }
+              else if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONEXC' || students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONEID'){
+                delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+                delete students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+                
+                // var tempArry = [];
+                // for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION) {
+                //   i && tempArry.push(i);
+                // }
+                // jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION = tempArry;
                 
                 // Update the exception_counter
                 exception_counter += 1  
               }
             }
+
           }
+
+          var tempArry = [];
+          for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION) {
+            i && tempArry.push(i);
+          }
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION = tempArry;
         }
         else {
           // Change in IPRC Date when blank
@@ -190,6 +216,29 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
   }
 
+  for (e in educators) {
+    let manual_fix = [
+      '010878510',
+      '013324496',
+      '015573983',
+      '029556685',
+      '034922005',
+      '040578981'
+    ]
+    
+    for (i in manual_fix){
+      if (educators[e].MEN._text == manual_fix[i]){
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].ACTION._text = 'UPDATE'
+        delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].ASSIGNMENT_START_DATE
+        educator_fix_counter += 1
+      }
+    }
+
+    if (!educators[e].MEN._text) {
+      educator_missing_men += 1
+    }
+  }
+
   // Display the number of records that were changed
   console.log('School Numner: ' + school_bsid)
   console.log('NONEXC/NONEID Records Changed: ' + exception_counter)
@@ -199,6 +248,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('Self ID\'s changed: ' + self_id_counter)
   console.log('Student Manual Fixes: ' + student_manual_counter)
   console.log('Second Language Fixes: ' + second_language_counter)
+  console.log('Educator Action Changes: ' + educator_fix_counter)
+  console.log('Educator Missing MEN: ' + educator_missing_men)
 
   // Convert the JSON to a string 
   jsonStr = JSON.stringify(jsonData)

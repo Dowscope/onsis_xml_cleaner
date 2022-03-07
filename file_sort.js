@@ -1,10 +1,10 @@
 
 const fs = require('fs')
 
-const school_code = 'VALL'
+const school_code = 'GOPS'
 const submission_period = 'OCT'
-const folder_path = 'h:\\2-onsis\\reports\\' + school_code + '\\'
-const output_path = 'h:\\2-onsis\\reports\\'
+const folder_path = 'h:\\1-onsis\\reports\\' + school_code + '\\'
+const output_path = 'h:\\1-onsis\\reports\\'
 
 // Create the folder structure
 fs.mkdirSync(output_path + submission_period)
