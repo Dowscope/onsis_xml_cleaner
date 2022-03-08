@@ -1,14 +1,23 @@
 // OnSIS XML Cleaner
 // Created By: Tim Dowling
 
+// Get command line arguments
+const arg = process.argv.slice(2)
+
+if (arg.length == 0){
+  console.log('School Code argument is missing.  ie. mnps')
+  process.exit(0)
+}
+
 // Required Files
 const xmljs = require('xml-js')
 const fs = require('fs')
+const { exit } = require('process')
 
 // Where the file is located and filename.
 const fileLoc = 'h:\\1-onsis\\results\\'
 // const fileLoc = 'h:\\2-onsis\\results\\'
-const file_name = 'gops.OUT' 
+const file_name = arg[0] + '.OUT' 
 const filePath = fileLoc + file_name
 
  

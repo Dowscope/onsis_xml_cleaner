@@ -21,7 +21,9 @@ Download the file in a known folder using the default filename from powerschool 
 Using NODE.JS run
 
 ```bash
-node app.js
+node app.js 000000 elem
 ```
+
+There are two arguments.  (1) The school BSID Number.  (2) The school level. elem - Elementary Schools, sec - Secondary Schools.
 
 It will output the cleaned file in the same folder and the one you downloaded to.

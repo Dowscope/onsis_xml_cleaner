@@ -1,7 +1,14 @@
+// Get command line arguments
+const arg = process.argv.slice(2)
+
+if (arg.length == 0){
+  console.log('School Code argument is missing.  ie. MNPS')
+  process.exit(0)
+}
 
 const fs = require('fs')
 
-const school_code = 'GOPS'
+const school_code = arg[0]
 const submission_period = 'OCT'
 const folder_path = 'h:\\1-onsis\\reports\\' + school_code + '\\'
 const output_path = 'h:\\1-onsis\\reports\\'
