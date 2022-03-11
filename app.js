@@ -71,8 +71,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   //   }
   // }
 
+  // Count total records
+  var student_counter = 0
+  var educator_counter = 0
 
   // Count how many records are being changed
+  var board_status_counter = 0
+  var res_status_counter = 0
   var exception_counter = 0
   var exception_del_counter = 0
   var speced_flag_counter = 0
@@ -89,6 +94,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Loop through the students
   for (s in students){
 
+    student_counter += 1
     // Manual Changes Here 
     // Students not end dated properly
     const student_end_fixes = [
@@ -138,12 +144,21 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
     
-    // Get all the keys in the Student enrollemnt sections
-
+    // Missing Board Status
     if (students[s].STUDENT_SCHOOL_ENROLMENT.STU_BRD_RES_STAT_TYPE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STU_BRD_RES_STAT_TYPE).length == 0){
       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STU_BRD_RES_STAT_TYPE._text = '01'
+      board_status_counter += 1
     }
-
+    
+    // Changed Residence Status (Work VISA)
+    if (students[s].STUDENT_SCHOOL_ENROLMENT.RESIDENCE_STATUS_TYPE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.RESIDENCE_STATUS_TYPE).length > 0){
+      if (students[s].STUDENT_SCHOOL_ENROLMENT.RESIDENCE_STATUS_TYPE._text == '4' || students[s].STUDENT_SCHOOL_ENROLMENT.RESIDENCE_STATUS_TYPE._text == '5'){
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.RESIDENCE_STATUS_TYPE._text = '16'
+        res_status_counter += 1
+      }
+    }
+    
+    // Get all the keys in the Student enrollemnt sections
     for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
       
       // Correc the error that this should be blank.
@@ -268,12 +283,15 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   }
 
   for (e in educators) {
+    educator_counter += 1
+
     let manual_status_fix = [
-      '017055484',
-      '019206978',
-      '022545263',
-      '039046529',
-      '046231486'
+      '030467880',
+      '039600085',
+      '041977687',
+      '054790902',
+      '055129001',
+      '055307425'
     ]
     
     for (i in manual_status_fix){
@@ -285,11 +303,11 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
 
     let manual_gender_fix = [
-      '056921141'
+      '015399694'
     ]
     
     for (i in manual_gender_fix){
-      if (educators[e].MEN._text == manual_status_fix[i]){
+      if (educators[e].MEN._text == manual_gender_fix[i]){
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].GENDER_TYPE._text = 'N'
         educator_gender_counter += 1
       }
@@ -300,8 +318,15 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
   }
 
-  // Display the number of records that were changed
   console.log('School Numner: ' + school_bsid)
+  // Display the toal records
+  console.log('Student Count: ' + student_counter)
+  console.log('Educator Count: ' + educator_counter)
+
+  // Display the number of records that were changed
+  
+  console.log('Board Status Changed: ' + board_status_counter)
+  console.log('Residence Status Changed: ' + res_status_counter)
   console.log('NONEXC/NONEID Records Changed: ' + exception_counter)
   console.log('\x1b[41m\x1b[33m%s\x1b[0m', 'Non-Exceptionals Deleted: ' + exception_del_counter)
   console.log('Special Ed Flag Change: ' + speced_flag_counter)
