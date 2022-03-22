@@ -1,4 +1,4 @@
-// OnSIS XML Cleaner
+// OnSIS Results To CSV
 // Created By: Tim Dowling
 
 // Get command line arguments
@@ -131,6 +131,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Output container
   var results = []
+  results.push(['OnSIS Error', 'Student#/MEN', 'Error Name', 'Current Value', 'Error Desc', 'Error Desc Continued'])
 
   // Loop through the classes
   for (c in classes) {

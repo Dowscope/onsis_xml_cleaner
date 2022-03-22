@@ -24,7 +24,7 @@ fs.mkdirSync(output_path + submission_period + '\\SAL Program')
 fs.mkdirSync(output_path + submission_period + '\\Summary Reports')
 fs.mkdirSync(output_path + submission_period + '\\Extra')
 
-if (school_code == 'WEST' || school_code == 'HAMM' || school_code == 'SUPE' || school_code == 'LAPS'){
+if (school_code == 'WEST' || school_code == 'HAMM' || school_code == 'SUPE' || school_code == 'LAPS' || school_code == 'LSHS' || school_code == 'MNHS'){
     fs.mkdirSync(output_path + submission_period + '\\ACS')
     fs.mkdirSync(output_path + submission_period + '\\Course Reports')
     fs.mkdirSync(output_path + submission_period + '\\Independent Study')
