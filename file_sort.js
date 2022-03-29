@@ -1,15 +1,22 @@
+// OnSIS Report Sorter
+// Created By: Tim Dowling
+
 // Get command line arguments
 const arg = process.argv.slice(2)
 
-if (arg.length == 0){
-  console.log('School Code argument is missing.  ie. MNPS')
+// Check if the correct amount of arguments is given.
+if (arg.length < 3){
+  console.log('School Code, School Level and Submission Period are missing.  ie. MNPS ELEM OCT, HAMM SEC OCT')
   process.exit(0)
 }
 
+// Import libraies
 const fs = require('fs')
 
+// Set variables
 const school_code = arg[0]
-const submission_period = 'OCT'
+const school_level = arg[1]
+const submission_period = arg[2]
 const folder_path = 'h:\\1-onsis\\reports\\' + school_code + '\\'
 const output_path = 'h:\\1-onsis\\reports\\'
 
@@ -24,7 +31,8 @@ fs.mkdirSync(output_path + submission_period + '\\SAL Program')
 fs.mkdirSync(output_path + submission_period + '\\Summary Reports')
 fs.mkdirSync(output_path + submission_period + '\\Extra')
 
-if (school_code == 'WEST' || school_code == 'HAMM' || school_code == 'SUPE' || school_code == 'LAPS' || school_code == 'LSHS' || school_code == 'MNHS'){
+// If a secondary school create necessary folders
+if (school_level == 'SEC'){
     fs.mkdirSync(output_path + submission_period + '\\ACS')
     fs.mkdirSync(output_path + submission_period + '\\Course Reports')
     fs.mkdirSync(output_path + submission_period + '\\Independent Study')
@@ -36,11 +44,14 @@ if (school_code == 'WEST' || school_code == 'HAMM' || school_code == 'SUPE' || s
     fs.mkdirSync(output_path + submission_period + '\\Students Without Classes')
 }
 else {
+    // Create Elementary specific folders
     fs.mkdirSync(output_path + submission_period + '\\Early Years')
 }
 
+// Get files from the folder
 const files = fs.readdirSync(folder_path)
 
+// Cycle through each file and move to the correct folder
 for (f in files) {
     var folder = ''
     const fileName = files[f].split('.')[0].split('-')[1]
