@@ -23,26 +23,30 @@ const csv = require('csvtojson')
 const files = fs.readdirSync(dir_path)
 
 // function to create new school file
-function createSchoolFile(rowArray = [], bsid, filepath, name){
-    output = ''
+function createSchoolFile(rowArray = [], bsid, sname, filepath, filename){
+    let output = ''
+    let record_count = 0
     for (t in rowArray) {
         output += rowArray[t]
         output += '\r\n'
+        record_count += 1
     }
+    if (record_count < 3) return
 
     const output_path = filepath + '\\' + bsid
     if (!fs.existsSync(output_path)){
         fs.mkdirSync(output_path)
     }
 
-    const output_file = output_path + '\\' + name + '.csv'
+    const output_file = output_path + '\\' + filename + '.csv'
     
-    fs.writeFileSync(output_file, output, (err) => {
+    fs.writeFile(output_file, output, (err) => {
         if (err) {
             console.log(err)
+            return
         }
     
-        console.log('Successful')
+        console.log(sname + ' - ' + bsid + '| File: ' + filename + ' - ' + record_count + ' successfully added.')
     })
 }
 
@@ -60,6 +64,7 @@ for (f in files){
         tmpSchool = []
         headerRow = ''
         school_bsid = ''
+        school_name = ''
 
         for (r in rows){
             var cleanRows = rows[r].replaceAll('"', '')
@@ -71,15 +76,20 @@ for (f in files){
             }
             else if (row[0] == 'H2'){
                 if (tmpSchool.length > 1){
-                    createSchoolFile(tmpSchool, school_bsid, dir_path, filename[0])
+                    createSchoolFile(tmpSchool, school_bsid, school_name, dir_path, filename[0])
                 }
                 tmpSchool = []
                 tmpSchool.push(headerRow)
                 tmpSchool.push(rows[r])
                 school_bsid = row[1]
+                school_name = row[2]
             }
             else if (row[0] == 'DT'){
                 tmpSchool.push(rows[r])
+            }
+
+            if (r == rows.length - 1){
+                createSchoolFile(tmpSchool, school_bsid, school_name, dir_path, filename[0])
             }
         }
     }

@@ -5,8 +5,8 @@
 const arg = process.argv.slice(2)
 
 // Check if the correct amount of arguments is given.
-if (arg.length < 3){
-  console.log('School Code, School Level and Submission Period are missing.  ie. MNPS ELEM OCT, HAMM SEC OCT')
+if (arg.length < 4){
+  console.log('School Code, School Level, Submission Period and Folder Path are missing.  ie. MNPS ELEM OCT C:\ONSIS, HAMM SEC OCT C:\ONSIS')
   process.exit(0)
 }
 
@@ -17,8 +17,8 @@ const fs = require('fs')
 const school_code = arg[0]
 const school_level = arg[1]
 const submission_period = arg[2]
-const folder_path = 'h:\\1-onsis\\reports\\' + school_code + '\\'
-const output_path = 'h:\\1-onsis\\reports\\'
+const folder_path = arg[3] + '\\' + school_code + '\\'
+const output_path = arg[3] + '\\'
 
 // Create the folder structure
 fs.mkdirSync(output_path + submission_period)
