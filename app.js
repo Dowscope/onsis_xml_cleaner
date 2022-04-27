@@ -4,8 +4,8 @@
 // Get command line arguments
 const arg = process.argv.slice(2)
 
-if (arg.length > 2){
-  console.log('School BSID and period arguments are missing.  ie. mnps elem or hamm sec')
+if (arg.length > 5){
+  console.log('File Location, School BSID, School Level, period and year arguments are missing.  ie. c:\\onsis\\ mnps elem oct 2021 or /batch/ hamm sec mar 2022')
   process.exit(0)
 }
 
@@ -13,24 +13,42 @@ if (arg.length > 2){
 const xmljs = require('xml-js')
 const fs = require('fs')
 
+
 // School and Period Information
-const school_bsid = arg[0]
+const school_bsid = arg[1]
+const sub_month = arg[3].toUpperCase()
+var sub_date = '_' + arg[4]
 var onsis_p
-if (arg[1] == 'elem'){
-   onsis_p = 'OCTELEM3'     // OCTELEM3 - Elementary | OCTSEC1 - Secondary
+if (arg[2] == 'elem'){
+   onsis_p = sub_month + 'ELEM'
+   if (sub_month == 'OCT') {
+     onsis_p = onsis_p + '3'
+     sub_date = sub_date + '1031_'
+   }
+   else if (sub_month == 'MAR') {
+     onsis_p = onsis_p + '2'
+     sub_date = sub_date + '0331_'
+   }
 }
-else if (arg[1] == 'sec'){
-  onsis_p = 'OCTSEC1'
+else if (arg[2] == 'sec'){
+  onsis_p = sub_month + 'SEC'
+  if (sub_month == 'OCT') {
+    onsis_p += '1'
+  }
+  else if (sub_month == 'MAR') {
+    onsis_p += '1'
+  }
 }
 else {
   console.log('School level argument is invalid.  elem or sec')
   process.exit(0)
 }
-const onsis_year = '_20211031_'
-const onsis_period = onsis_p + onsis_year
+
+
+const onsis_period = onsis_p + sub_date
 
 // Where the file is located and filename.
-const fileLoc = 'H:\\1-onsis\\batch\\'
+const fileLoc = arg[0]
 const file_name = 'ONSIS_' + onsis_period + school_bsid + '.xml' 
 const filePath = fileLoc + file_name
 
@@ -110,49 +128,31 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students not end dated properly
   const student_end_fixes = [
-    '328324207',
-    '328281605',
-    '328287297',
-    '328316153',
-    '328317292',
-    '328320320',
-    '328320338',
-    '328320346',
-    '328320353',
-    '328324090',
-    '328324108',
-    '328324140',
-    '328324173',
-    '328324199',
-    '328325006',
+    '328318597',
+    '328324454',
+    '328325055',
+    '328332259',
+    '328332267',
   ]
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
-    '328269287',
-    '328295837',
-    '328326889',
-    '328326996',
-    '328327093',
-    '328331889',
-    '328334230',
-
+    '330345968',
+    '330354374',
+    '359012788',
+    '359116539',
+    '359117801',
   ]
 
   // Students that have a wrong exit code.
   const student_postal_fixes = [
-    '328331186'
+    '359116539',
   ]
 
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
-    '013461710',
-    '033966748',
-    '034397794',
-    '037719085',
-    '037964061',
-    '044327302',
+    
   ]
   
   // Loop through the students
@@ -218,6 +218,14 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         res_status_counter += 1
       }
     }
+
+    // Self-ID incorrect
+    if (students[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION).length > 0){
+      if (students[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text == '2'){
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text = '002'
+        res_status_counter += 1
+      }
+    }
     
     // Get all the keys in the Student enrollemnt sections
     for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
@@ -265,6 +273,17 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       // Find the Special Education section
       if (key == 'SPECIAL_EDUCATION'){
         if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION).length != 8){
+          var saveRecord = false
+          var numOfDeleted = 0
+          for( sped in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].ACTION._text == 'DELETE'){
+              numOfDeleted += 1
+            }
+          }
+          if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION).length - numOfDeleted == 1){
+            saveRecord = true
+          }
+
           for( sped in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
 
             // Change in IPRC Date when blank or if IRPC date is greater then submission date.
@@ -299,17 +318,32 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             // If student has a certain type NONEXC or NONIND then lets change it
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE).length >= 0){
               if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE).length == 0){
-                delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
-                delete students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
-
-                exception_del_counter += 1
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].ACTION._text == 'DELETE'){
+                  continue
+                }
+                else {
+                  delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+                  delete students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+                  exception_del_counter += 1
+                }
                 continue
               }
-              else if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONEXC' || students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONEID'){
-                delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
-                delete students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
-                
-                exception_del_counter += 1
+              else if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONEXC' || students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text == 'NONIND'){
+                if (!saveRecord){
+                  delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+                  delete students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped]
+                  exception_del_counter += 1
+                }
+                else {
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].EXCEPTIONALITY_TYPE._text = ''
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].NON_IDENTIFIED_STUDENT_FLAG._text = 'T'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].MAIN_EXCEPTIONALITY_FLAG._text = 'F'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].IPRC_STUDENT_FLAG._text = 'F'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sped].IPRC_REVIEW_DATE = {}
+                  
+                  // Update the exception_counter
+                  exception_counter += 1 
+                }
                 continue
               }
             }

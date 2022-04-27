@@ -4,8 +4,8 @@
 // Get command line arguments
 const arg = process.argv.slice(2)
 
-if (arg.length == 0){
-  console.log('School Code argument is missing.  ie. mnps')
+if (arg.length == 1){
+  console.log('File Path and School Code argument is missing.  ie. H:\\onsis\\ mnps')
   process.exit(0)
 }
 
@@ -15,9 +15,9 @@ const fs = require('fs')
 const { exit } = require('process')
 
 // Where the file is located and filename.
-const fileLoc = 'h:\\1-onsis\\results\\'
+const fileLoc = arg[0]
 // const fileLoc = 'h:\\2-onsis\\results\\'
-const file_name = arg[0] + '.OUT' 
+const file_name = arg[1] + '.OUT' 
 const filePath = fileLoc + file_name
 
  
