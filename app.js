@@ -19,23 +19,45 @@ const school_bsid = arg[1]
 const sub_month = arg[3].toUpperCase()
 var sub_date = '_' + arg[4]
 var onsis_p
+var back_date
+var submission_date
+
 if (arg[2] == 'elem'){
    onsis_p = sub_month + 'ELEM'
    if (sub_month == 'OCT') {
+     back_date = sub_date + '/07/01'
+     submission_date = sub_date + '/11/01'
      onsis_p = onsis_p + '3'
      sub_date = sub_date + '1031_'
    }
    else if (sub_month == 'MAR') {
-     onsis_p = onsis_p + '2'
-     sub_date = sub_date + '0331_'
+    back_date = parseInt(sub_date)-1 + '/11/01'
+    submission_date = sub_date + '/04/01'
+    onsis_p = onsis_p + '2'
+    sub_date = sub_date + '0331_'
+   }
+   else if (sub_month == 'JUN') {
+    back_date = sub_date + '/04/01'
+    submission_date = sub_date + '/07/01'
+    onsis_p = onsis_p + '2'
+    sub_date = sub_date + '0631_'
    }
 }
 else if (arg[2] == 'sec'){
   onsis_p = sub_month + 'SEC'
   if (sub_month == 'OCT') {
+    back_date = sub_date + '/07/01'
+    submission_date = sub_date + '/11/01'
     onsis_p += '1'
   }
   else if (sub_month == 'MAR') {
+    back_date = parseInt(sub_date)-1 + '/11/01'
+    submission_date = sub_date + '/03/01'
+    onsis_p += '1'
+  }
+  else if (sub_month == 'JUN') {
+    back_date = sub_date + '/03/01'
+    submission_date = sub_date + '/07/01'
     onsis_p += '1'
   }
 }
@@ -51,6 +73,8 @@ const onsis_period = onsis_p + sub_date
 const fileLoc = arg[0]
 const file_name = 'ONSIS_' + onsis_period + school_bsid + '.xml' 
 const filePath = fileLoc + file_name
+
+const output_file = fileLoc + '_' + school_bsid + '_OnSISChangeLog.csv'
 
 // Open the file
 fs.readFile(filePath, 'utf-8', (err, data)=> {
@@ -88,6 +112,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var irpc_date_greater_counter = 0
   var placement_type_counter = 0
   var enrollment_end_date_counter = 0
+  var enrollment_start_date_counter = 0
   var crs_complete_counter = 0
   var self_id_counter = 0
   var student_manual_counter = 0
@@ -99,31 +124,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Student Changes - Student Number
   // Students with IA codes.
   const student_ia_fixes = [
-    '328315460',
-    '328302310',
-    '328302336',
-    '328302344',
-    '328302401',
-    '328302419',
-    '328302443',
-    '328302476',
-    '328302971',
-    '328303391',
-    '328303532',
-    '328304092',
-    '328304209',
-    '328306063',
-    '328320213',
-    '328324637',
-    '328324835',
-    '328327523',
-    '328327887',
-    '328328125',
-    '328331012',
-    '328335351',
-    '328335955',
-    '328337241',
-    '328337266',
+    '359011285'
   ]
 
   // Students not end dated properly
@@ -137,11 +138,9 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
-    '330345968',
-    '330354374',
-    '359012788',
-    '359116539',
-    '359117801',
+    '359055563',
+    '359001906',
+    '359055803',
   ]
 
   // Students that have a wrong exit code.
@@ -149,11 +148,41 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     '359116539',
   ]
 
+  // Students that need a status change from ADD to UPDATE
+  const student_status_change = [
+    '359027034',
+    '359033404',
+    '359034386',
+    '359055522',
+    '359056223',
+    '359056231',
+    '359079621',
+    '359079639',
+    '359079647',
+    '359079977',
+    '359100153',
+    '359100294',
+    '359103462',
+    '359103470',
+    '359103488',
+    '359103496',
+    '359105756',
+    '359123412',
+    '359123415',
+    '359123639',
+    '359123852',
+  ]
+
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
     
   ]
+
+  // Initialize the array to for the changes log
+  const change_log = []
+  change_log.push('Student Number, Change to be made\n\r')
+
   
   // Loop through the students
   for (s in students){
@@ -166,13 +195,14 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_ia_fixes[student_number]){
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE._text = '38'
         student_manual_counter += 1
+        change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Change entry code to 38\n\r')
       }
     }
 
     // Students not end dated properly
     for (student_number in student_end_fixes){
       if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_end_fixes[student_number]){
-        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text = '2021/07/01'
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text = back_date
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE_EXIT._text = '71'
         if (students[s].STUDENT_SCHOOL_ENROLMENT.DAYS_ABSENT_YTD){
           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.DAYS_ABSENT_YTD._text = '0'
@@ -186,6 +216,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ATTENDANCE_TYPE._text = 'FT'
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.FTE._text = '1.00'
         student_manual_counter += 1
+        change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Changed exit date to ' + back_date + ' and exit code to 71' + '\n\r')
       }
     }
 
@@ -194,14 +225,16 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_exit_fixes[student_number]){
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE_EXIT._text = '71'
         student_manual_counter += 1
+        change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Changed exit code to 71' + '\n\r')
       }
     }
 
-    // Students that have a wrong exit code.
+    // Students that have a wrong postal code.
     for (student_number in student_postal_fixes){
       if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_postal_fixes[student_number]){
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.POSTAL_AREA_TYPE._text = 'P0T 2E0'
         student_manual_counter += 1
+        change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Postal code is invalid' + '\n\r')
       }
     }
     
@@ -209,6 +242,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     if (students[s].STUDENT_SCHOOL_ENROLMENT.STU_BRD_RES_STAT_TYPE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STU_BRD_RES_STAT_TYPE).length == 0){
       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STU_BRD_RES_STAT_TYPE._text = '01'
       board_status_counter += 1
+      change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Missing board residence status, make Pupil of the board' + '\n\r')
     }
     
     // Changed Residence Status (Work VISA)
@@ -224,6 +258,21 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       if (students[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text == '2'){
         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text = '002'
         res_status_counter += 1
+      }
+      if (students[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text == '3'){
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.INDIGENOUS_SELF_IDENTIFICATION._text = '003'
+        res_status_counter += 1
+      }
+    }
+
+    // If the status is ADD then the start date has to be within the submission period.
+    if (students[s].STUDENT_SCHOOL_ENROLMENT.ACTION._text == 'ADD') {
+      if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_START_DATE).length > 0){
+        if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_START_DATE._text) < new Date(submission_date)){
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text = submission_date
+          enrollment_start_date_counter += 1
+          change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Check school enrolment start date' + '\n\r')
+        }
       }
     }
     
@@ -263,8 +312,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       // Make sure that dates before July are corrected to July 1st.
       if (key == 'ENROLMENT_END_DATE') {
         if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
-          if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text) < new Date('2021/07/01')){
-            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text = '2021/07/01'
+          if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text) < new Date(back_date)){
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text = back_date
             enrollment_end_date_counter += 1
           }
         }
@@ -387,6 +436,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.SPECIAL_EDU_PLMNT_TYPE).length == 0){
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.SPECIAL_EDU_PLMNT_TYPE._text = 'I'
               placement_type_counter += 1
+              change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Special Education Program is missing Placement Type' + '\n\r')
             }
           }
 
@@ -441,6 +491,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     if (!educators[e].GENDER_TYPE || Object.keys(educators[e].GENDER_TYPE).length == 0){
       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].GENDER_TYPE._text = 'N'
       educator_gender_counter += 1
+      change_log.push(educators[e].MEN._text + ', Educator is missing their gender\n\r')
     }
 
     // Check if there are any educators that have missing MEN's
@@ -464,6 +515,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('IPRC DATE Records Changed: ' + iprc_date_counter)
   console.log('IRPC Date is greater then Submission Date changed: ' + irpc_date_greater_counter)
   console.log('Placement Type Records Changed: ' + placement_type_counter)
+  console.log('Enrollment Start Dates Fixed: ' + enrollment_start_date_counter)
   console.log('Enrollment End Dates Fixed: ' + enrollment_end_date_counter)
   console.log('Courses Completed Flag Fixed: ' + crs_complete_counter)
   console.log('Self ID\'s changed: ' + self_id_counter)
@@ -485,6 +537,19 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       console.log('NOT SUCCESSFUL: ERROR - ' + err)
       return
     }
-    console.log('Successful! ')
+    console.log('XML Successful! ')
+  })
+
+  var output = ''
+  for (let row in change_log) {
+    output += change_log[row]
+  }
+
+  fs.writeFileSync(output_file, output, (err) => {
+      if (err) {
+          console.log(err)
+      }
+
+      console.log('Change Log Successful')
   })
 })
