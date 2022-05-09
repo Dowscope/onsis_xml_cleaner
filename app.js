@@ -123,6 +123,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var educator_missing_men = 0
   var educator_gender_counter = 0
   var educator_startdate_counter = 0
+  var educator_core_counter = 0
 
   // Manual Student Changes - Student Number
   // Students with IA codes.
@@ -511,6 +512,24 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       educator_startdate_counter += 1
     }
 
+    // Educator core flag wrong.
+    if (educators[e].POSITION_TYPE && educators[e].POSITION_TYPE._text == 'TEA') {
+      if (educators[e].CORE_FLAG._text == 'F' && (!educators[e].NEW_EDUCATOR_LEAVE_TYPE && !educators[e].NEW_ASSIGNMENT_WTHD_TYPE)) {
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'T'
+        change_log.push(educators[e].MEN._text + ', Educator class assignmnet flag not checked?\n\r')
+        educator_core_counter += 1
+      }
+      else if ((educators[e].NEW_EDUCATOR_LEAVE_TYPE || educators[e].NEW_ASSIGNMENT_WTHD_TYPE) && educators[e].CORE_FLAG._text == 'T') {
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'F'
+        change_log.push(educators[e].MEN._text + ', Educator is on leave but still attached to a class\n\r')
+        educator_core_counter += 1
+        if (educators[e].TEACHING_TYPE != 'N/A') {
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].TEACHING_TYPE._text = 'N/A' 
+          change_log.push(educators[e].MEN._text + ', Educator is on leave but teaching type is not N/A\n\r')
+        }
+      }
+    }
+
     // If an educator has no gender, set it to NON-DISCLOSED
     if (!educators[e].GENDER_TYPE || Object.keys(educators[e].GENDER_TYPE).length == 0){
       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].GENDER_TYPE._text = 'N'
@@ -550,6 +569,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('\x1b[33m%s\x1b[0m', 'Educator Gender Changes (Manual Changes): ' + educator_gender_counter)
   console.log('\x1b[41m\x1b[33m%s\x1b[0m', 'Educator Missing MEN: ' + educator_missing_men)
   console.log('Educator start date not needed: ' + educator_startdate_counter)
+  console.log('Educator core flag change: ' + educator_core_counter)
 
   // Convert the JSON to a string 
   jsonStr = JSON.stringify(jsonData)
