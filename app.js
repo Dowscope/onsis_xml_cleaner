@@ -117,6 +117,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var self_id_counter = 0
   var language_type_counter = 0
   var student_start_counter = 0
+  var student_gender_s_counter = 0
+  var student_entrycode_counter = 0
   var student_manual_counter = 0
   var second_language_counter = 0
   var educator_status_counter = 0
@@ -280,8 +282,20 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
 
-    if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_START_DATE._text == '2021/10/31'){
-      console.log(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text)
+    // Gender Type is 'S' and no Desc.
+    if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE._text == 'S') {
+      if (students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_DESC && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_DESC).length == 0) {
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE._text = 'N'
+        change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Student gender is specified and no desc was given, It has been reported as Not Disclosed' + '\n\r')
+        student_gender_s_counter += 1
+      }
+    }
+
+    // Missing Entry Code.
+    if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE).length == 0) {
+      jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE._text = '38'
+      change_log.push(students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text + ', Student entry code is missing, It has been reported as 38 - Unknown' + '\n\r')
+      student_entrycode_counter += 1
     }
 
     // If the status is ADD then the start date has to be within the submission period.
@@ -563,10 +577,12 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('Courses Completed Flag Fixed: ' + crs_complete_counter)
   console.log('Self ID\'s changed: ' + self_id_counter)
   console.log('Launguage Type Changes: ' + language_type_counter)
+  console.log('Student Gender Change: ' + student_gender_s_counter)
+  console.log('Student Entry Code Change: ' + student_entrycode_counter)
   console.log('\x1b[33m%s\x1b[0m', 'Student Manual Fixes: ' + student_manual_counter)
   console.log('Second Language Fixes: ' + second_language_counter)
   console.log('\x1b[33m%s\x1b[0m', 'Educator Action Changes (Manual Changes): ' + educator_status_counter)
-  console.log('\x1b[33m%s\x1b[0m', 'Educator Gender Changes (Manual Changes): ' + educator_gender_counter)
+  console.log('Educator Gender Changes: ' + educator_gender_counter)
   console.log('\x1b[41m\x1b[33m%s\x1b[0m', 'Educator Missing MEN: ' + educator_missing_men)
   console.log('Educator start date not needed: ' + educator_startdate_counter)
   console.log('Educator core flag change: ' + educator_core_counter)
@@ -586,7 +602,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     console.log('XML Successful! ')
   })
 
-  change_log.push('MEN\'s will need a leading zero to search them in PowerSchool\n\r')
+  change_log.push('Please NOTE:  MEN\'s will need a leading zero to search for them in PowerSchool\n\r')
 
   var output = ''
   for (let row in change_log) {
