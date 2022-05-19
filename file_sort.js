@@ -5,20 +5,45 @@
 const arg = process.argv.slice(2)
 
 // Check if the correct amount of arguments is given.
-if (arg.length < 4){
-  console.log('School Code, School Level, Submission Period and Folder Path are missing.  ie. MNPS ELEM OCT C:\ONSIS, HAMM SEC OCT C:\ONSIS')
+if (arg.length < 5){
+  console.log('School Code, School Level, Submission Period, Folder Path and submission year are missing.  ie. MNPS ELEM OCT C:\ONSIS 20212022, HAMM SEC OCT C:\ONSIS 20222023')
   process.exit(0)
 }
 
 // Import libraies
 const fs = require('fs')
+const prompt = require('prompt-sync')({sigint: true})
 
 // Set variables
-const school_code = arg[0]
-const school_level = arg[1]
-const submission_period = arg[2]
+const school_code = arg[0].toUpperCase()
+const school_level = arg[1].toUpperCase()
+const submission_period = arg[2].toUpperCase()
 const folder_path = arg[3] + '\\' + school_code + '\\'
-const output_path = arg[3] + '\\'
+const submission_year = arg[4]
+
+if (!fs.existsSync(arg[3] + '\\' + submission_year)){
+    fs.mkdirSync(arg[3] + '\\' + submission_year)
+}
+if (!fs.existsSync(arg[3] + '\\' + submission_year + '\\' + school_code)){
+    fs.mkdirSync(arg[3] + '\\' + submission_year + '\\' + school_code)
+}
+if (!fs.existsSync(arg[3] + '\\' + submission_year + '\\' + school_code)){
+    fs.mkdirSync(arg[3] + '\\' + submission_year + '\\' + school_code)
+}
+if (fs.existsSync(arg[3] + '\\' + submission_year + '\\' + school_code + '\\' + submission_period)){
+    console.log('Reports previously generated.  To continue type \'yes\' and press enter: ')
+    const user_continue = prompt()
+    if (user_continue != 'yes') {
+        process.exit(0)
+    }
+    fs.rmdirSync(arg[3] + '\\' + submission_year + '\\' + school_code + '\\' + submission_period, { recursive: true }, (err) => {
+        if (err) {
+            throw err
+        }
+        console.log('Previous reports removed successfully')
+    })
+}
+const output_path = arg[3] + '\\' + submission_year + '\\' + school_code + '\\'
 
 // Create the folder structure
 fs.mkdirSync(output_path + submission_period)
@@ -112,4 +137,3 @@ for (f in files) {
         }
     })
 }
-
