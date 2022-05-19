@@ -171,6 +171,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   for (s in students){
     var enrollment_errors = false
     const id = students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text
+    const id_oen = students[s].OEN._text
     if (Object.keys(students[s].DATA_ERROR_DETAILS).length > 0){
       const rows_ste = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].DATA_ERROR_DETAILS, null)
       for (r in rows_ste){
@@ -180,7 +181,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
 
     if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS).length > 0){
-      const rows_stee = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
+      const rows_stee = printError(id_oen, 'STUDENT_SCHOOL_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
       for (r in rows_stee){
         results.push(rows_stee[r])
       }
