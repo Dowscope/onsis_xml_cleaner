@@ -28,19 +28,19 @@ if (arg[2] == 'elem') {
     back_date = sub_date + '/07/01'
     submission_date = sub_date + '/10/31'
     onsis_p = onsis_p + '3'
-    sub_date = sub_date + '1031_'
+    sub_date = sub_date + '1031'
   }
   else if (sub_month == 'MAR') {
     back_date = parseInt(sub_date)-1 + '/11/01'
     submission_date = sub_date + '/03/31'
     onsis_p = onsis_p + '2'
-    sub_date = sub_date + '0331_'
+    sub_date = sub_date + '0331'
   }
   else if (sub_month == 'JUN') {
     back_date = sub_date + '/04/01'
     submission_date = sub_date + '/06/26'
     onsis_p = onsis_p + '2'
-    sub_date = sub_date + '0631_'
+    sub_date = sub_date + '0631'
   }
 }
 else if (arg[2] == 'sec'){
@@ -67,7 +67,7 @@ else {
 }
 
 
-const onsis_period = onsis_p + '_' + sub_date
+const onsis_period = onsis_p + '_' + sub_date + '_'
 
 // Where the file is located and filename.
 const fileLoc = arg[0]
@@ -159,6 +159,12 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   ]
 
   // Initialize the array to for the changes log
+  const change_log_json = {
+    submissionDate: report_year,
+    subMonth: sub_month,
+    bsid: school_bsid,
+    changes: []
+  }
   const change_log = []
 
   
@@ -688,17 +694,25 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     console.log('XML Successful! ')
   })
 
+  change_log_json.changes = change_log
+
   // PDF Creation
   const html = fs.readFileSync("template.html", "utf8");
   const options = {
     format: "Letter",
     orientation: "portrait",
-    border: "10mm",
+    border: "5mm",
+    footer: {
+      height: "5mm",
+      contents: {
+          default: '<span style="float: right;"><span style="color: #444;">{{page}}</span> of <span>{{pages}} pages</span></span>'
+      }
+  }
   };
   var document = {
     html: html,
     data: {
-      changes: change_log,
+      changes: change_log_json,
     },
     path: output_file,
     type: "",

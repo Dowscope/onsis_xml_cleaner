@@ -13,7 +13,8 @@
 		</style>
   </head>
   <body>
-		<h1 style="text-align: center;">OnSIS Changes</h1>
+		<h1 style="text-align: center; margin-bottom: 2px;">OnSIS Changes</h1>
+		<h5 style="text-align: center; margin: 0;">School: {{changes.bsid}} Submission Year: {{changes.submissionDate}} Submission Month: {{changes.subMonth}}</h5>
 		<h2>Please make the following changes to PowerSchool</h2>
 		<table style="border: 1px solid black;">
 			<thead>
@@ -21,7 +22,7 @@
 				<td style="font-weight: bold;text-align: center;" width="150px">MEN</td>
 				<td style="font-weight: bold;text-align: center;">Description of Change</td>
 			</thead>
-			{{#each changes}}
+			{{#each changes.changes}}
 			<tr style="border: 1px solid black;">
 				<td style="text-align: center;">{{this.StudentNumber}}</td>
 				<td style="text-align: center;">{{this.MEN}}</td>
@@ -31,7 +32,7 @@
 		</table>
 		<div class="footer">
 			<p>
-				<strong>Please NOTE:</strong> Educator MEN's will need a leading zero to search for them in PowerSchool. To search MEN - Goto STAFF search and in the search bar start typing MEN till you get an MEN pop up. Click on that then continue to type = and then the MEN after.  Dont forget the 0
+				<strong>Please NOTE:</strong> To search MEN - Goto STAFF search and in the search bar start typing MEN till you get an MEN pop up. Click on that then continue to type = and then the MEN after.
 			</p>
 		</div>
   </body>
