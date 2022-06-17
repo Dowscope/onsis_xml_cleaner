@@ -13,16 +13,18 @@ if (arg.length > 5){
 const xmljs = require('xml-js')
 const fs = require('fs')
 const pdf = require('pdf-creator-node')
+const { parse } = require('path')
 
 // School and Period Information
 const school_bsid = arg[1]
+const school_level = arg[2].toUpperCase()
 const sub_month = arg[3].toUpperCase()
 var sub_date = arg[4]
 var onsis_p
 var back_date
 var submission_date
 
-if (arg[2] == 'elem') {
+if (school_level == 'ELEM') {
   onsis_p = sub_month + 'ELEM'
   if (sub_month == 'OCT') {
     back_date = sub_date + '/07/01'
@@ -43,22 +45,25 @@ if (arg[2] == 'elem') {
     sub_date = sub_date + '0631'
   }
 }
-else if (arg[2] == 'sec'){
+else if (school_level == 'SEC'){
   onsis_p = sub_month + 'SEC'
   if (sub_month == 'OCT') {
     back_date = sub_date + '/07/01'
     submission_date = sub_date + '/10/31'
     onsis_p += '1'
+    sub_date = sub_date + '1031'
   }
   else if (sub_month == 'MAR') {
     back_date = parseInt(sub_date)-1 + '/11/01'
     submission_date = sub_date + '/03/31'
-    onsis_p += '1'
+    onsis_p += '2'
+    sub_date = sub_date + '0331'
   }
   else if (sub_month == 'JUN') {
     back_date = sub_date + '/03/01'
     submission_date = sub_date + '/05/26'
     onsis_p += '1'
+    sub_date = sub_date + '0631'
   }
 }
 else {
@@ -88,7 +93,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const xmlData = xmljs.xml2json(data, {compact: true,spaces: 2})
   const jsonData = JSON.parse(xmlData)
 
-  // Grab all the students
+  // Grab all the classes, students and educators
+  const classes = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS
   const students = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT
   const educators = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT
 
@@ -99,10 +105,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const fileName = fileLoc + report_year + "_" + report_period + "_" + school_number + ".xml"
 
   // Count total records
+  var class_counter = 0
   var student_counter = 0
   var educator_counter = 0
 
   // Count how many records are being changed
+  var class_duplicate_counter = 0
+  var class_type_counter = 0
   var board_status_counter = 0
   var res_status_counter = 0
   var exception_counter = 0
@@ -114,6 +123,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var enrollment_end_date_counter = 0
   var enrollment_start_date_counter = 0
   var crs_complete_counter = 0
+  var crs_startdate_counter = 0
   var self_id_counter = 0
   var language_type_counter = 0
   var student_gender_s_counter = 0
@@ -153,6 +163,10 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const student_postal_fixes = [
   ]
 
+  const class_start_fixes = [
+
+  ]
+
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
@@ -167,6 +181,51 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   }
   const change_log = []
 
+  const class_codes = []
+
+  // Loop through all the classes
+  for (var c=0;c<classes.length;c++){
+    var valid = true
+    for (code of class_codes){
+      if (classes[c].CLASS_CODE._text == code.code) {
+        if (code.segment){
+          delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c]
+          classes.splice(c,1)
+          c--
+        }
+        else {
+          const index = parseInt(code.index)
+          delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index]
+          classes.splice(index,1)
+          c--
+        }
+        class_duplicate_counter += 1
+        valid = false
+      }
+    }
+
+    var tempArry = [];
+    for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS) {
+      i && tempArry.push(i);
+    }
+    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS = tempArry;
+
+    if(valid){
+      class_counter += 1
+      var hasSegment = false
+      if (classes[c].SEGMENT){
+        hasSegment = true
+      }
+      
+      // Classtype not needed when ACTION is UPDATE
+      if (classes[c].ACTION._text == 'UPDATE' && classes[c].CLASS_TYPE){
+        delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].CLASS_TYPE
+        class_type_counter += 1
+      }
+
+      class_codes.push({'code':classes[c].CLASS_CODE._text, 'index':c, 'segment':hasSegment})
+    }
+  }
   
   // Loop through the students
   for (s in students){
@@ -257,6 +316,16 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
 
+    // If status is update then remove the start date.
+    for (student_number in class_start_fixes){
+      if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == class_start_fixes[student_number]){
+        if(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.ACTION._text == "UPDATE") {
+          delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_START_DATE
+          crs_startdate_counter += 1
+        }
+      }
+    }
+
     // ----- Automatic Changes -----
     
     // Missing Board Status
@@ -314,14 +383,16 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
 
     // Gender Type is 'S' and no Desc.
-    if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE._text == 'S') {
-      if (students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_DESC && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_DESC).length == 0) {
-        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE._text = 'N'
-        change_log.push({
-          'StudentNumber': students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text,
-          'Desc': 'Student gender is specified and no desc was given, It has been reported as Not Disclosed'
-        });
-        student_gender_s_counter += 1
+    if (students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE){
+      if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE._text == 'S') {
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_DESC && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.GENDER_DESC).length == 0) {
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.GENDER_TYPE._text = 'N'
+          change_log.push({
+            'StudentNumber': students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text,
+            'Desc': 'Student gender is specified and no desc was given, It has been reported as Not Disclosed'
+          });
+          student_gender_s_counter += 1
+        }
       }
     }
 
@@ -350,10 +421,11 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     // Get all the keys in the Student enrollemnt sections
     for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
       if (key == 'STUDENT_CLASS_ENROLMENT'){
-        if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT).length > 10){
+        if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT).length > 20){
           if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK).length > 0){
             if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text == 'F'){
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text = 'T'
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_INCOMPLETE_FLAG._text = 'F'
               crs_complete_counter += 1
             }
           }
@@ -363,6 +435,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK).length > 0){
               if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text == 'F'){
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text = 'T'
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_INCOMPLETE_FLAG._text = 'T'
                 crs_complete_counter += 1
               }
             }
@@ -569,6 +642,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
   }
 
+  // Loop through all the educators
   for (e in educators) {
     educator_counter += 1
 
@@ -595,30 +669,31 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
     // Educator that is TEACHER REGULAR core flag wrong.
     if (educators[e].POSITION_TYPE && educators[e].POSITION_TYPE._text == 'TEA') {
-
-      // Core flag is False and they are not on leave correction.
-      if (educators[e].CORE_FLAG._text == 'F' && (!educators[e].NEW_EDUCATOR_LEAVE_TYPE && !educators[e].NEW_ASSIGNMENT_WTHD_TYPE)) {
-        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'T'
-        change_log.push({
-          'MEN': educators[e].MEN._text,
-          'Desc': 'Educator has teaching type of TEACHER REGULAR,  Educator class assignmnet flag must be checked and must be LEAD or CO-TEACHER of a HOMEROOM CLASS'
-        });
-        educator_core_counter += 1
-      }
-      // Core flag is True and they are ON leave correction
-      else if ((educators[e].NEW_EDUCATOR_LEAVE_TYPE || educators[e].NEW_ASSIGNMENT_WTHD_TYPE) && educators[e].CORE_FLAG._text == 'T') {
-        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'F'
-        change_log.push({
-          'MEN': educators[e].MEN._text,
-          'Desc': 'Educator has teaching type of TEACHER REGULAR, Educator is on leave but still attached to a class'
-        });
-        educator_core_counter += 1
-        if (educators[e].TEACHING_TYPE != 'N/A') {
-          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].TEACHING_TYPE._text = 'N/A' 
+      if (school_level == 'ELEM'){
+        // Core flag is False and they are not on leave correction.
+        if (educators[e].CORE_FLAG && educators[e].CORE_FLAG._text == 'F' && !educators[e].NEW_EDUCATOR_LEAVE_TYPE && !educators[e].NEW_ASSIGNMENT_WTHD_TYPE) {
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'T'
           change_log.push({
             'MEN': educators[e].MEN._text,
-            'Desc': 'Educator is on leave but teaching type is not N/A'
+            'Desc': 'Educator has teaching type of TEACHER REGULAR,  Educator class assignmnet flag must be checked and must be LEAD or CO-TEACHER of a HOMEROOM CLASS'
           });
+          educator_core_counter += 1
+        }
+        // Core flag is True and they are ON leave correction
+        else if ((educators[e].NEW_EDUCATOR_LEAVE_TYPE || educators[e].NEW_ASSIGNMENT_WTHD_TYPE) && educators[e].CORE_FLAG._text == 'T') {
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'F'
+          change_log.push({
+            'MEN': educators[e].MEN._text,
+            'Desc': 'Educator has teaching type of TEACHER REGULAR, Educator is on leave but still attached to a class'
+          });
+          educator_core_counter += 1
+          if (educators[e].TEACHING_TYPE != 'N/A') {
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].TEACHING_TYPE._text = 'N/A' 
+            change_log.push({
+              'MEN': educators[e].MEN._text,
+              'Desc': 'Educator is on leave but teaching type is not N/A'
+            });
+          }
         }
       }
     }
@@ -626,7 +701,9 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     // Educator on leave and teaching type is not N/A
     if ((educators[e].NEW_EDUCATOR_LEAVE_TYPE || educators[e].NEW_ASSIGNMENT_WTHD_TYPE) && educators[e].TEACHING_TYPE != 'N/A'){
       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].TEACHING_TYPE._text = 'N/A'
-      jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'F'
+      if (school_level != 'SEC'){
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'F'
+      }
       change_log.push({
         'MEN': educators[e].MEN._text,
         'Desc': 'Educator is on leave but teaching type is not N/A'
@@ -651,11 +728,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   console.log('School Numner: ' + school_bsid)
   // Display the toal records
+  console.log('Class Count: ' + class_counter)
   console.log('Student Count: ' + student_counter)
   console.log('Educator Count: ' + educator_counter)
 
   // Display the number of records that were changed
-  
+  console.log('Class Duplicates removed: ' + class_duplicate_counter)
+  console.log('Class Type Changed: ' + class_type_counter)
   console.log('Board Status Changed: ' + board_status_counter)
   console.log('Residence Status Changed: ' + res_status_counter)
   console.log('NONEXC/NONEID Records Changed: ' + exception_counter)
@@ -667,6 +746,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('Enrollment Start Dates Fixed: ' + enrollment_start_date_counter)
   console.log('Enrollment End Dates Fixed: ' + enrollment_end_date_counter)
   console.log('Courses Completed Flag Fixed: ' + crs_complete_counter)
+  console.log('Course Start Date Removed: ' + crs_startdate_counter)
   console.log('Self ID\'s changed: ' + self_id_counter)
   console.log('Launguage Type Changes: ' + language_type_counter)
   console.log('Student Gender Change: ' + student_gender_s_counter)
