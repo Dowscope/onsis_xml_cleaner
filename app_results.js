@@ -128,6 +128,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var stu_shsm_counter = 0
   var stu_shsm_cert_counter = 0
   var tea_counter = 0
+  var tea_class_counter = 0
 
   // Output container
   var results = []
@@ -181,7 +182,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
 
     if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS).length > 0){
-      const rows_stee = printError(id_oen, 'STUDENT_SCHOOL_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
+      const rows_stee = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
       for (r in rows_stee){
         results.push(rows_stee[r])
       }
@@ -446,6 +447,52 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
       tea_counter += 1
     }
+
+    // Check class assignments for errors
+    if (educators[e].CLASS_ASSIGNMENT){
+      if (Array.isArray(educators[e].CLASS_ASSIGNMENT)){
+        for (ee in educators[e].CLASS_ASSIGNMENT){
+          if (Array.isArray(educators[e].CLASS_ASSIGNMENT[ee].DATA_ERROR_DETAILS)){
+            for (err in educators[e].CLASS_ASSIGNMENT[ee].DATA_ERROR_DETAILS){
+              if (Object.keys(educators[e].CLASS_ASSIGNMENT[ee].DATA_ERROR_DETAILS[err]).length > 0){
+                const rows = printError(id, 'EDUCATOR ERROR', educators[e].CLASS_ASSIGNMENT[ee].DATA_ERROR_DETAILS[err], educators[e].CLASS_ASSIGNMENT[ee].CLASS_CODE)
+                for (r in rows){
+                  results.push(rows[r])
+                }
+                tea_class_counter += 1
+              }
+            }
+          }
+          else if (Object.keys(educators[e].CLASS_ASSIGNMENT[ee].DATA_ERROR_DETAILS).length > 0){
+            const rows = printError(id, 'EDUCATOR ERROR', educators[e].CLASS_ASSIGNMENT[ee].DATA_ERROR_DETAILS, educators[e].CLASS_ASSIGNMENT[ee].CLASS_CODE)
+            for (r in rows){
+              results.push(rows[r])
+            }
+            tea_class_counter += 1
+          }
+        }
+      }
+      else {
+        if (Array.isArray(educators[e].CLASS_ASSIGNMENT.DATA_ERROR_DETAILS)){
+          for (err in educators[e].CLASS_ASSIGNMENT.DATA_ERROR_DETAILS){
+            if (Object.keys(educators[e].CLASS_ASSIGNMENT.DATA_ERROR_DETAILS[err]).length > 0){
+              const rows = printError(id, 'EDUCATOR ERROR', educators[e].CLASS_ASSIGNMENT.DATA_ERROR_DETAILS[err], educators[e].CLASS_ASSIGNMENT.CLASS_CODE)
+              for (r in rows){
+                results.push(rows[r])
+              }
+              tea_class_counter += 1
+            }
+          }
+        }
+        else if (Object.keys(educators[e].CLASS_ASSIGNMENT.DATA_ERROR_DETAILS).length > 0){
+          const rows = printError(id, 'EDUCATOR ERROR', educators[e].CLASS_ASSIGNMENT.DATA_ERROR_DETAILS, educators[e].CLASS_ASSIGNMENT.CLASS_CODE)
+          for (r in rows){
+            results.push(rows[r])
+          }
+          tea_class_counter += 1
+        }
+      }
+    }
   }
 
   // console.log(results[4000])
@@ -464,6 +511,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('SHSM Errors: ' + stu_shsm_counter)
   console.log('SHSM Cert Errors: ' + stu_shsm_cert_counter)
   console.log('Educator Errors: ' + tea_counter)
+  console.log('Educator Class Assignment Errors: ' + tea_class_counter)
 
 
   // Create the CSV File

@@ -123,6 +123,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var enrollment_end_date_counter = 0
   var enrollment_start_date_counter = 0
   var crs_complete_counter = 0
+  var crs_credit_counter = 0
+  var crs_change_enddate_counter = 0
   var crs_startdate_counter = 0
   var self_id_counter = 0
   var language_type_counter = 0
@@ -131,6 +133,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var student_manual_counter = 0
   var second_language_counter = 0
   var educator_status_counter = 0
+  var educator_class_counter = 0
   var educator_missing_men = 0
   var educator_gender_counter = 0
   var educator_startdate_counter = 0
@@ -151,6 +154,9 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
+    '330230061',
+    '330259391',
+    '359123433'
   ]
 
   // Students need status change
@@ -163,16 +169,42 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const student_postal_fixes = [
   ]
 
+  // Students class start date removed when ACTION is update
   const class_start_fixes = [
+    
+  ]
 
+  // Error with class start date and should be removed.
+  const student_class_start = [
+    '330274457',
+    '330276650',
+    '330358995',
   ]
 
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
+    '010996486',
+    '011817681',
+    '013926332',
+    '016367328',
+    '025518556',
+    '028837995',
+    '035759497',
+    '041109448',
   ]
 
-  // Initialize the array to for the changes log
+  // Class assignmnets for educators should be UPDATE
+  const manual_class_fix = [
+    ['010996486', [ 'HSP3U1-02' ]],
+    ['011817681', [ 'TCJ2O1-01' ]],
+    ['013926332', [ 'MCR3UA-01', 'MTH1WA-01', 'MPM2DA-01' ]],
+    ['025518556', [ 'SBI3U1-02', 'SBI3U1-03', 'SVN3M1-01']],
+    ['028837995', [ 'CGC1P1-03' ]],
+    ['035759497', [ 'HIP4O1-01', 'CGC1P1-02', 'CGC1D1-04']],
+    ['041109448', [ 'LNOAO1-02', 'BMI3C1/BMX3E1-02', 'LNOAO1-01']],
+  ]
+
   const change_log_json = {
     submissionDate: report_year,
     subMonth: sub_month,
@@ -184,19 +216,82 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const class_codes = []
 
   // Loop through all the classes
-  for (var c=0;c<classes.length;c++){
+  for (var c = 0; c < classes.length; c++ ){
     var valid = true
     for (code of class_codes){
+      const index = parseInt(code.index)
       if (classes[c].CLASS_CODE._text == code.code) {
-        if (code.segment){
+        if (classes[c].SEGMENT){
+          
+          if (!classes[index].SEGMENT){
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index].SEGMENT = classes[c].SEGMENT
+            classes[index].SEGMENT = classes[c].SEGMENT
+          }
+          else {
+            if (Array.isArray(classes[c].SEGMENT)){
+              for (seg of classes[c].SEGMENT){
+                if (Array.isArray(classes[index].SEGMENT)){
+                  var duplicate = false
+                  for (cc of classes[index].SEGMENT){
+                    if (Object.keys(cc.MINISTRY_DFND_CRS).length > 0 && cc.MINISTRY_DFND_CRS._text == seg.MINISTRY_DFND_CRS._text){
+                      duplicate = true
+                    }
+                    else if (Object.keys(cc.LOCAL_DEV_CRS).length > 0 && cc.LOCAL_DEV_CRS._text == seg.LOCAL_DEV_CRS._text){
+                      duplicate = true
+                    }
+                  }
+
+                  if (!duplicate){
+                    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index].SEGMENT.push(seg)
+                  }
+                }
+                else {
+                  const segs = []
+                  segs.push(classes[index].SEGMENT)
+
+                  if (classes[index].SEGMENT.MINISTRY_DFND_CRS._text != seg.MINISTRY_DFND_CRS._text || classes[index].SEGMENT.LOCAL_DEV_CRS._text != seg.LOCAL_DEV_CRS._text){
+                    segs.push(seg)
+                  }
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index].SEGMENT = segs
+                }
+              }
+            }
+            else {
+              if (Array.isArray(classes[index].SEGMENT)){
+                var duplicate = false
+                for (cc of classes[index].SEGMENT){
+                  if (Object.keys(cc.MINISTRY_DFND_CRS).length > 0 && cc.MINISTRY_DFND_CRS._text == classes[c].SEGMENT.MINISTRY_DFND_CRS._text){
+                    duplicate = true
+                  }
+                  else if (Object.keys(cc.LOCAL_DEV_CRS).length > 0 && cc.LOCAL_DEV_CRS._text == classes[c].SEGMENT.LOCAL_DEV_CRS._text){
+                    duplicate = true
+                  }
+                }
+
+                if (!duplicate){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index].SEGMENT.push(classes[c].SEGMENT)
+                }
+              }
+              else {
+                const segs = []
+                segs.push(classes[index].SEGMENT)
+
+                if (classes[index].SEGMENT.MINISTRY_DFND_CRS._text != classes[c].SEGMENT.MINISTRY_DFND_CRS._text || classes[index].SEGMENT.LOCAL_DEV_CRS._text != classes[c].SEGMENT.LOCAL_DEV_CRS._text){
+                  segs.push(classes[c].SEGMENT)
+                }
+
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index].SEGMENT = segs
+              }
+            }
+          }
+
           delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c]
           classes.splice(c,1)
           c--
         }
         else {
-          const index = parseInt(code.index)
-          delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index]
-          classes.splice(index,1)
+          delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c]
+          classes.splice(c,1)
           c--
         }
         class_duplicate_counter += 1
@@ -204,11 +299,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
 
-    var tempArry = [];
-    for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS) {
-      i && tempArry.push(i);
+    if (!valid){
+      var tempArry = [];
+      for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS) {
+        i && tempArry.push(i);
+      }
+      jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS = tempArry;
     }
-    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS = tempArry;
 
     if(valid){
       class_counter += 1
@@ -326,6 +423,14 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
 
+    // Error with class start date needs removed.
+    for (student_number in student_class_start){
+      if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_class_start[student_number]){
+        delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_START_DATE
+        crs_startdate_counter += 1
+      }
+    }
+
     // ----- Automatic Changes -----
     
     // Missing Board Status
@@ -422,21 +527,67 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
       if (key == 'STUDENT_CLASS_ENROLMENT'){
         if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT).length > 20){
-          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK).length > 0){
+          
+          // Passing mark and complete flag error.
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK).length > 0 && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE._text != 'W'){
             if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text == 'F'){
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text = 'T'
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_INCOMPLETE_FLAG._text = 'F'
               crs_complete_counter += 1
             }
           }
+
+          // The earned credit is zero even with passing mark.
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK).length > 0){
+            const mark = parseInt(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK._text)
+            if (mark >= 50 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE._text == '0.00'){
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE = students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CREDIT_VALUE
+              crs_credit_counter += 1
+            }
+          }
+
+          // Class end date exceeds enrolment date
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE).length > 0){
+            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
+              const crs_enddate = new Date(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE._text)
+              const enr_enddate = new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text)
+              if (enr_enddate < crs_enddate){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE = students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE
+                crs_change_enddate_counter += 1
+              }
+            }
+          }
         }
         else {
           for ( cls in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT ){
-            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK).length > 0){
+
+            // Passing mark and complete flag error.
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK).length > 0 && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE._text != 'W'){
               if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text == 'F'){
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text = 'T'
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_INCOMPLETE_FLAG._text = 'T'
                 crs_complete_counter += 1
+              }
+            }
+
+            // The earned credit is zero even with passing mark.
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK).length > 0){
+              const mark = parseInt(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK._text)
+              if (mark >= 50 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].EARNED_CREDIT_VALUE._text == '0.00'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].EARNED_CREDIT_VALUE = students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].CREDIT_VALUE
+                crs_credit_counter += 1
+              }
+            }
+
+            // Class end date exceeds enrolment date
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE).length > 0){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
+                const crs_enddate = new Date(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE._text)
+                const enr_enddate = new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE._text)
+                if (enr_enddate < crs_enddate){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE = students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE
+                  crs_change_enddate_counter += 1
+                }
               }
             }
           }
@@ -657,6 +808,30 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
     }
 
+    // Changing the status for class assignments.
+    for (i in manual_class_fix){
+      if (educators[e].MEN._text == manual_class_fix[i][0]){
+        if (Array.isArray(educators[e].CLASS_ASSIGNMENT)){
+          for (code in educators[e].CLASS_ASSIGNMENT){
+            for (manual_code of manual_class_fix[i][1]){
+              if (educators[e].CLASS_ASSIGNMENT[code].CLASS_CODE._text == manual_code){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CLASS_ASSIGNMENT[code].ACTION._text = 'UPDATE'
+                educator_class_counter += 1
+              }
+            }
+          }
+        }
+        else {
+          for (manual_code of manual_class_fix[i][1]){
+            if (educators[e].CLASS_ASSIGNMENT.CLASS_CODE._text == manual_code){
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CLASS_ASSIGNMENT.ACTION._text = 'UPDATE'
+              educator_class_counter += 1
+            }
+          }
+        }
+      }
+    }
+
     // ----- Automatic Changes -----
 
     // Remove start date if the status is update
@@ -727,7 +902,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   }
 
   console.log('School Numner: ' + school_bsid)
-  // Display the toal records
+
+  // Display the total records
   console.log('Class Count: ' + class_counter)
   console.log('Student Count: ' + student_counter)
   console.log('Educator Count: ' + educator_counter)
@@ -746,6 +922,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('Enrollment Start Dates Fixed: ' + enrollment_start_date_counter)
   console.log('Enrollment End Dates Fixed: ' + enrollment_end_date_counter)
   console.log('Courses Completed Flag Fixed: ' + crs_complete_counter)
+  console.log('Courses Credit Earned Fixed: ' + crs_credit_counter)
+  console.log('Course End Date Correction: ' + crs_change_enddate_counter)
   console.log('Course Start Date Removed: ' + crs_startdate_counter)
   console.log('Self ID\'s changed: ' + self_id_counter)
   console.log('Launguage Type Changes: ' + language_type_counter)
@@ -754,6 +932,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('\x1b[33m%s\x1b[0m', 'Student Manual Fixes: ' + student_manual_counter)
   console.log('Second Language Fixes: ' + second_language_counter)
   console.log('\x1b[33m%s\x1b[0m', 'Educator Action Changes (Manual Changes): ' + educator_status_counter)
+  console.log('\x1b[33m%s\x1b[0m', 'Educator Class Assignment Status Changes (Manual Changes): ' + educator_class_counter)
   console.log('Educator Gender Changes: ' + educator_gender_counter)
   console.log('\x1b[41m\x1b[33m%s\x1b[0m', 'Educator Missing MEN: ' + educator_missing_men)
   console.log('Educator start date not needed: ' + educator_startdate_counter)
