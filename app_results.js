@@ -170,55 +170,87 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   //Loop through the students
   for (s in students){
-    var enrollment_errors = false
-    const id = students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text
-    const id_oen = students[s].OEN._text
-    if (Object.keys(students[s].DATA_ERROR_DETAILS).length > 0){
-      const rows_ste = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].DATA_ERROR_DETAILS, null)
-      for (r in rows_ste){
-        results.push(rows_ste[r])
+    if (students[s].STUDENT_SCHOOL_ENROLMENT){
+      var enrollment_errors = false
+      const id = students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text
+      const id_oen = students[s].OEN._text
+      if (Object.keys(students[s].DATA_ERROR_DETAILS).length > 0){
+        const rows_ste = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].DATA_ERROR_DETAILS, null)
+        for (r in rows_ste){
+          results.push(rows_ste[r])
+        }
+        enrollment_errors = true
       }
-      enrollment_errors = true
-    }
-
-    if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS).length > 0){
-      const rows_stee = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
-      for (r in rows_stee){
-        results.push(rows_stee[r])
+  
+      if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS).length > 0){
+        const rows_stee = printError(id, 'STUDENT_SCHOOL_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.DATA_ERROR_DETAILS, null)
+        for (r in rows_stee){
+          results.push(rows_stee[r])
+        }
+        enrollment_errors = true
       }
-      enrollment_errors = true
-    }
-
-    // Get all the keys in the Student enrollemnt sections
-    for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
-      if (key == 'STUDENT_CLASS_ENROLMENT'){
-        if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
-          for (ce in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
-            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].DATA_ERROR_DETAILS).length > 0){
-              const rows_se = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
-              for (r in rows_se){
-                results.push(rows_se[r])
+  
+      // Get all the keys in the Student enrollemnt sections
+      for (key in students[s].STUDENT_SCHOOL_ENROLMENT){
+        if (key == 'STUDENT_CLASS_ENROLMENT'){
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+            for (ce in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].DATA_ERROR_DETAILS).length > 0){
+                const rows_se = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
+                for (r in rows_se){
+                  results.push(rows_se[r])
+                }
+                student_ce_counter += 1
               }
-              student_ce_counter += 1
-            }
-
-            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO){
-              if(Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO)){
-                for (oci in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO){
-                  if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO[oci]).length > 0){
-                    const rows_oci = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
-                    for (r in rows_oci){
-                      results.push(rows_oci[r])
+  
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO){
+                if(Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO)){
+                  for (oci in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO){
+                    if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO[oci]).length > 0){
+                      const rows_oci = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
+                      for (r in rows_oci){
+                        results.push(rows_oci[r])
+                      }
+                      student_oci_counter += 1
+                    }
+                  }
+                }
+                else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO).length > 0){
+                  if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO.DATA_ERROR_DETAILS).length > 0){
+                    const rows_ocii = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
+                    for (r in rows_ocii){
+                      results.push(rows_ocii[r])
                     }
                     student_oci_counter += 1
                   }
                 }
               }
-              else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO).length > 0){
-                if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO.DATA_ERROR_DETAILS).length > 0){
-                  const rows_ocii = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE)
-                  for (r in rows_ocii){
-                    results.push(rows_ocii[r])
+            }
+          }
+          else if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.DATA_ERROR_DETAILS && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT[key].DATA_ERROR_DETAILS).length > 0){
+            const rows_sce = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
+            for (r in rows_sce){
+              results.push(rows_sce[r])
+            }
+            student_ce_counter += 1
+  
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO){
+              if(Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO)){
+                for (oci in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO){
+                  if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS).length > 0){
+                    const rows_scee = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
+                    for (r in rows_scee){
+                      results.push(rows_scee[r])
+                    }
+                    student_oci_counter += 1
+                  }
+                }
+              }
+              else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO).length > 0){
+                if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO.DATA_ERROR_DETAILS).length > 0){
+                  const rows_sceee = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
+                  for (r in rows_sceee){
+                    results.push(rows_sceee[r])
                   }
                   student_oci_counter += 1
                 }
@@ -226,145 +258,124 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             }
           }
         }
-        else if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.DATA_ERROR_DETAILS && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT[key].DATA_ERROR_DETAILS).length > 0){
-          const rows_sce = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
-          for (r in rows_sce){
-            results.push(rows_sce[r])
-          }
-          student_ce_counter += 1
-
-          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO){
-            if(Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO)){
-              for (oci in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO){
-                if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS).length > 0){
-                  const rows_scee = printError(id, 'STUDENT_CLASS_ENROLMENT', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO[oci].DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
-                  for (r in rows_scee){
-                    results.push(rows_scee[r])
-                  }
-                  student_oci_counter += 1
+  
+        if (key == 'SPECIAL_EDUCATION'){
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION)){
+            for (se in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[se].DATA_ERROR_DETAILS).length > 0){
+                const rows_spe = printError(id, 'SPECIAL_EDUCATION', students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[se].DATA_ERROR_DETAILS, null)
+                for (r in rows_spe){
+                  results.push(rows_spe[r])
                 }
-              }
-            }
-            else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO).length > 0){
-              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO.DATA_ERROR_DETAILS).length > 0){
-                const rows_sceee = printError(id, 'OTHER COURSE INFO', students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.OTHER_COURSE_INFO.DATA_ERROR_DETAILS, students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE)
-                for (r in rows_sceee){
-                  results.push(rows_sceee[r])
-                }
-                student_oci_counter += 1
+                stu_speced_counter += 1
               }
             }
           }
-        }
-      }
-
-      if (key == 'SPECIAL_EDUCATION'){
-        if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION)){
-          for (se in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
-            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[se].DATA_ERROR_DETAILS).length > 0){
-              const rows_spe = printError(id, 'SPECIAL_EDUCATION', students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[se].DATA_ERROR_DETAILS, null)
-              for (r in rows_spe){
-                results.push(rows_spe[r])
+          else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION).length > 0){
+            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.DATA_ERROR_DETAILS).length > 0){
+              const rows_spee = printError(id, 'SPECIAL_EDUCATION', students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.DATA_ERROR_DETAILS, null)
+              for (r in rows_spee){
+                results.push(rows_spee[r])
               }
               stu_speced_counter += 1
             }
           }
         }
-        else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION).length > 0){
-          if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.DATA_ERROR_DETAILS).length > 0){
-            const rows_spee = printError(id, 'SPECIAL_EDUCATION', students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.DATA_ERROR_DETAILS, null)
-            for (r in rows_spee){
-              results.push(rows_spee[r])
+  
+        if (key == 'SECOND_LANGUAGE_PROGRAM') {
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
+            for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[slp].DATA_ERROR_DETAILS).length > 0){
+                const rows_slp = printError(id, 'SECOND_LANGUAGE_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[slp].DATA_ERROR_DETAILS, null)
+                for (r in rows_slp){
+                  results.push(rows_slp[r])
+                }
+                stu_slp_counter += 1
+              }
             }
-            stu_speced_counter += 1
           }
-        }
-      }
-
-      if (key == 'SECOND_LANGUAGE_PROGRAM') {
-        if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
-          for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
-            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, 'SECOND_LANGUAGE_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[slp].DATA_ERROR_DETAILS, null)
-              for (r in rows_slp){
-                results.push(rows_slp[r])
+          else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM).length > 0){
+            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.DATA_ERROR_DETAILS).length > 0){
+              const rows_slpp = printError(id, 'SECOND_LANGUAGE_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.DATA_ERROR_DETAILS, null)
+              for (r in rows_slpp){
+                results.push(rows_slpp[r])
               }
               stu_slp_counter += 1
             }
           }
         }
-        else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM).length > 0){
-          if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, 'SECOND_LANGUAGE_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.DATA_ERROR_DETAILS, null)
-            for (r in rows_slpp){
-              results.push(rows_slpp[r])
+  
+        if (key == 'PLAR') {
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR)){
+            for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.PLAR){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR[slp].DATA_ERROR_DETAILS).length > 0){
+                const rows_slp = printError(id, 'PLAR', students[s].STUDENT_SCHOOL_ENROLMENT.PLAR[slp].DATA_ERROR_DETAILS, null)
+                for (r in rows_slp){
+                  results.push(rows_slp[r])
+                }
+                stu_plar_counter += 1
+              }
             }
-            stu_slp_counter += 1
           }
-        }
-      }
-
-      if (key == 'PLAR') {
-        if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR)){
-          for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.PLAR){
-            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, 'PLAR', students[s].STUDENT_SCHOOL_ENROLMENT.PLAR[slp].DATA_ERROR_DETAILS, null)
-              for (r in rows_slp){
-                results.push(rows_slp[r])
+          else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR).length > 0){
+            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR.DATA_ERROR_DETAILS).length > 0){
+              const rows_slpp = printError(id, 'PLAR', students[s].STUDENT_SCHOOL_ENROLMENT.PLAR.DATA_ERROR_DETAILS, null)
+              for (r in rows_slpp){
+                results.push(rows_slpp[r])
               }
               stu_plar_counter += 1
             }
           }
         }
-        else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR).length > 0){
-          if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.PLAR.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, 'PLAR', students[s].STUDENT_SCHOOL_ENROLMENT.PLAR.DATA_ERROR_DETAILS, null)
-            for (r in rows_slpp){
-              results.push(rows_slpp[r])
+  
+        if (key == 'DIPLOMA') {
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA)){
+            for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA[slp].DATA_ERROR_DETAILS).length > 0){
+                const rows_slp = printError(id, 'DIPLOMA', students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA[slp].DATA_ERROR_DETAILS, null)
+                for (r in rows_slp){
+                  results.push(rows_slp[r])
+                }
+                stu_diploma_counter += 1
+              }
             }
-            stu_plar_counter += 1
           }
-        }
-      }
-
-      if (key == 'DIPLOMA') {
-        if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA)){
-          for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA){
-            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, 'DIPLOMA', students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA[slp].DATA_ERROR_DETAILS, null)
-              for (r in rows_slp){
-                results.push(rows_slp[r])
+          else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA).length > 0){
+            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA.DATA_ERROR_DETAILS).length > 0){
+              const rows_slpp = printError(id, 'DIPLOMA', students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA.DATA_ERROR_DETAILS, null)
+              for (r in rows_slpp){
+                results.push(rows_slpp[r])
               }
               stu_diploma_counter += 1
             }
           }
         }
-        else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA).length > 0){
-          if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, 'DIPLOMA', students[s].STUDENT_SCHOOL_ENROLMENT.DIPLOMA.DATA_ERROR_DETAILS, null)
-            for (r in rows_slpp){
-              results.push(rows_slpp[r])
-            }
-            stu_diploma_counter += 1
-          }
-        }
-      }
-
-      if (key == 'SHSM_PROGRAM') {
-        if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM)){
-          for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM){
-            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].DATA_ERROR_DETAILS).length > 0){
-              const rows_slp = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].DATA_ERROR_DETAILS, null)
-              for (r in rows_slp){
-                results.push(rows_slp[r])
+  
+        if (key == 'SHSM_PROGRAM') {
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM)){
+            for (slp in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM){
+              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].DATA_ERROR_DETAILS).length > 0){
+                const rows_slp = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].DATA_ERROR_DETAILS, null)
+                for (r in rows_slp){
+                  results.push(rows_slp[r])
+                }
+                stu_shsm_counter += 1
               }
-              stu_shsm_counter += 1
-            }
-            if (students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION){
-              if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION)){
-                for (sc in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION){
-                  if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS).length > 0){
-                    const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION){
+                if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION)){
+                  for (sc in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION){
+                    if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS).length > 0){
+                      const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
+                      for (r in rows_sc){
+                        results.push(rows_sc[r])
+                      }
+                      stu_shsm_cert_counter += 1
+                    }
+                  }
+                }
+                else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION).length > 0){
+                  if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION.DATA_ERROR_DETAILS).length > 0){
+                    const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
                     for (r in rows_sc){
                       results.push(rows_sc[r])
                     }
@@ -372,45 +383,36 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                   }
                 }
               }
-              else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION).length > 0){
-                if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION.DATA_ERROR_DETAILS).length > 0){
-                  const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[slp].SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
+            }
+          }
+          else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM).length > 0){
+            if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.DATA_ERROR_DETAILS).length > 0){
+              const rows_slpp = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.DATA_ERROR_DETAILS, null)
+              for (r in rows_slpp){
+                results.push(rows_slpp[r])
+              }
+              stu_shsm_counter += 1
+            }
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION){
+              if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION)){
+                for (sc in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION){
+                  if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS).length > 0){
+                    const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
+                    for (r in rows_sc){
+                      results.push(rows_sc[r])
+                    }
+                    stu_shsm_cert_counter += 1
+                  }
+                }
+              }
+              else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION).length > 0){
+                if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION.DATA_ERROR_DETAILS).length > 0){
+                  const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
                   for (r in rows_sc){
                     results.push(rows_sc[r])
                   }
                   stu_shsm_cert_counter += 1
                 }
-              }
-            }
-          }
-        }
-        else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM).length > 0){
-          if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.DATA_ERROR_DETAILS).length > 0){
-            const rows_slpp = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.DATA_ERROR_DETAILS, null)
-            for (r in rows_slpp){
-              results.push(rows_slpp[r])
-            }
-            stu_shsm_counter += 1
-          }
-          if (students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION){
-            if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION)){
-              for (sc in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION){
-                if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS).length > 0){
-                  const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION[sc].DATA_ERROR_DETAILS, null)
-                  for (r in rows_sc){
-                    results.push(rows_sc[r])
-                  }
-                  stu_shsm_cert_counter += 1
-                }
-              }
-            }
-            else if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION).length > 0){
-              if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION.DATA_ERROR_DETAILS).length > 0){
-                const rows_sc = printError(id, 'SHSM_PROGRAM', students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.SHSM_CERTIFICATION.DATA_ERROR_DETAILS, null)
-                for (r in rows_sc){
-                  results.push(rows_sc[r])
-                }
-                stu_shsm_cert_counter += 1
               }
             }
           }
