@@ -36,6 +36,7 @@ if (fs.existsSync(arg[3] + '\\' + submission_year + '\\' + school_code + '\\' + 
     if (user_continue != 'yes') {
         process.exit(0)
     }
+    console.log('Removing Previous...')
     fs.rmdirSync(arg[3] + '\\' + submission_year + '\\' + school_code + '\\' + submission_period, { recursive: true }, (err) => {
         if (err) {
             throw err

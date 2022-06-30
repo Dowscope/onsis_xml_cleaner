@@ -40,9 +40,9 @@ if (school_level == 'ELEM') {
   }
   else if (sub_month == 'JUN') {
     back_date = sub_date + '/04/01'
-    submission_date = sub_date + '/06/26'
-    onsis_p = onsis_p + '2'
-    sub_date = sub_date + '0631'
+    submission_date = sub_date + '/06/30'
+    onsis_p = onsis_p + '4'
+    sub_date = sub_date + '0628'
   }
 }
 else if (school_level == 'SEC'){
@@ -61,9 +61,9 @@ else if (school_level == 'SEC'){
   }
   else if (sub_month == 'JUN') {
     back_date = sub_date + '/03/01'
-    submission_date = sub_date + '/05/26'
-    onsis_p += '1'
-    sub_date = sub_date + '0631'
+    submission_date = sub_date + '/06/30'
+    onsis_p += '4'
+    sub_date = sub_date + '0628'
   }
 }
 else {
@@ -126,6 +126,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   var crs_credit_counter = 0
   var crs_change_enddate_counter = 0
   var crs_startdate_counter = 0
+  var crs_langtype_counter = 0
   var self_id_counter = 0
   var language_type_counter = 0
   var student_gender_s_counter = 0
@@ -154,6 +155,10 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
+    '330230632',
+    '330254988',
+    '330277476',
+    '359048626',
   ]
 
   // Students need status change
@@ -168,7 +173,25 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students class start date removed when ACTION is update
   const class_start_fixes = [
-    
+  ]
+
+  // Error showing language type of 34
+  const class_lang_type_fixes = [
+    '330259417',
+    '330263864',
+    '330265984',
+    '330271461',
+    '330277476',
+    '330287624',
+    '330294307',
+    '330304783',
+    '330344557',
+    '359017266',
+    '359047016',
+    '359082666',
+    '359089646',
+    '330218595',
+    '359123458',
   ]
 
   // Error with class start date and should be removed.
@@ -178,6 +201,11 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
+    '017502220',
+    '018280768',
+    '019854199',
+    '023666225',
+    '059076588',
   ]
 
   // Class assignmnets for educators should be UPDATE
@@ -396,9 +424,19 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       // If status is update then remove the start date.
       for (student_number in class_start_fixes){
         if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == class_start_fixes[student_number]){
-          if(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.ACTION._text == "UPDATE") {
-            delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_START_DATE
-            crs_startdate_counter += 1
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+            for (c in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+              if(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].ACTION._text == "UPDATE") {
+                delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].COURSE_START_DATE
+                crs_startdate_counter += 1
+              }
+            }
+          }
+          else {
+            if(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.ACTION._text == "UPDATE") {
+              delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_START_DATE
+              crs_startdate_counter += 1
+            }
           }
         }
       }
@@ -408,6 +446,26 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_class_start[student_number]){
           delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_START_DATE
           crs_startdate_counter += 1
+        }
+      }
+
+      // Error with class language type.
+      for (student_number in class_lang_type_fixes){
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == class_lang_type_fixes[student_number]){
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+            for (c in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT) {
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].LANGUAGE_TYPE._text == '34'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].LANGUAGE_TYPE._text = 'E'
+                crs_langtype_counter += 1
+              }
+            }
+          }
+          else {
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.LANGUAGE_TYPE._text == '34'){
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].LANGUAGE_TYPE._text = 'E'
+              crs_langtype_counter += 1
+            }
+          }
         }
       }
   
@@ -906,6 +964,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('Courses Credit Earned Fixed: ' + crs_credit_counter)
   console.log('Course End Date Correction: ' + crs_change_enddate_counter)
   console.log('Course Start Date Removed: ' + crs_startdate_counter)
+  console.log('Course Language Type Change: ' + crs_langtype_counter)
   console.log('Self ID\'s changed: ' + self_id_counter)
   console.log('Launguage Type Changes: ' + language_type_counter)
   console.log('Student Gender Change: ' + student_gender_s_counter)
