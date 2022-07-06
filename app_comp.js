@@ -49,8 +49,6 @@ for (var row in ps_rows) {
     }
 }
 
-console.log('Total OnSIS Enrolments: ' + onsis_students.length)
-console.log('Total PowerSchool Enrolments: ' + ps_students.length)
 
 if (onsis_students.length > ps_students.length) {
     for (s_on of onsis_students) {
@@ -84,3 +82,7 @@ else if (ps_students.length > onsis_students.length) {
         }
     }
 }
+
+
+console.log('Total OnSIS Enrolments: ' + onsis_students.length)
+console.log('Total PowerSchool Enrolments: ' + ps_students.length)

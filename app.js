@@ -14,6 +14,7 @@ const xmljs = require('xml-js')
 const fs = require('fs')
 const pdf = require('pdf-creator-node')
 const { parse } = require('path')
+const { setMaxListeners } = require('events')
 
 // School and Period Information
 const school_bsid = arg[1]
@@ -143,6 +144,23 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Student Changes - Student Number
   // Students with IA codes.
   const student_ia_fixes = [
+    '330251687',
+    '330260407',
+    '330266065',
+    '330274739',
+    '330281015',
+    '330282625',
+    '330306945',
+    '330307869',
+    '330328386',
+    '359035482',
+    '359053799',
+    '359054210',
+    '359060183',
+    '359078531',
+    '359092236',
+    '72172281',
+    '359124143',
   ]
 
   // Students that are missing a entry code.
@@ -155,10 +173,28 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
-    '330230632',
-    '330254988',
-    '330277476',
-    '359048626',
+    '330289836'
+  ]
+
+  // Students should be ADD not UPDATE
+  const student_status_add = [
+    '330251687',
+    '330260407',
+    '330266065',
+    '330274739',
+    '330281015',
+    '330282625',
+    '330306945',
+    '330307869',
+    '330328386',
+    '359035482',
+    '359053799',
+    '359054210',
+    '359060183',
+    '359078531',
+    '359092236',
+    '72172281',
+    '359124143',
   ]
 
   // Students need status change
@@ -198,14 +234,22 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const student_class_start = [
   ]
 
+  // Weird error change with course end date exceeding submission date.
+  const student_crs_exceed = [
+    '359123654',
+    '359123655',
+  ]
+  const date_exceeded = '2022/03/31'
+  const change_date = '2022/03/30'
+
+  // Not all course indicators are the same.
+  const crs_indicator_flag = true
+  const crs_ind_code = 'SAM'
+  const crs_ind_change = '3'
+
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
-    '017502220',
-    '018280768',
-    '019854199',
-    '023666225',
-    '059076588',
   ]
 
   // Class assignmnets for educators should be UPDATE
@@ -339,6 +383,47 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     // ----- Manual Changes -----
 
     if (students[s].STUDENT_SCHOOL_ENROLMENT){
+      // Status Change to add
+      for (student_number in student_status_add){
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_status_add[student_number]){
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ACTION._text = 'ADD'
+
+          // Change spec ed if applicable
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
+            if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION)){
+              for (speced in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[speced].ACTION._text == 'UPDATE'){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[speced].ACTION._text = 'ADD'
+                }
+              }
+            }
+            else {
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text == 'UPDATE'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text = 'ADD'
+              }
+            }
+          }
+
+          // Change Classes if applicable
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+            if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+              for (c in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].ACTION._text == 'UPDATE'){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].ACTION._text = 'ADD'
+                }
+              }
+            }
+            else {
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.ACTION._text == 'UPDATE'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.ACTION._text = 'ADD'
+              }
+            }
+          }
+
+          student_manual_counter += 1
+        }
+      }
+      
       // Status Changes
       for (student_number in student_status_fixes){
         if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_status_fixes[student_number]){
@@ -468,6 +553,29 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           }
         }
       }
+
+      // Weird error change with course end date exceeding submission date.
+      for (student_number in student_crs_exceed){
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_crs_exceed[student_number]){
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+            for (c in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].CLASS_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].CLASS_END_DATE).length > 0){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].CLASS_END_DATE._text == date_exceeded){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].CLASS_END_DATE._text = change_date
+                }
+              }
+            }
+          }
+          else {
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_END_DATE).length > 0){
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_END_DATE._text == date_exceeded){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_END_DATE._text = change_date
+              }
+            }
+          }
+          student_manual_counter += 1
+        }
+      }
   
       // ----- Automatic Changes -----
       
@@ -595,6 +703,25 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                 }
               }
             }
+
+            // Class complete/incomplete and not all values have been entered.
+            if ((students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text == 'T' || students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_INCOMPLETE_FLAG._text == 'T') && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE).length == 0){
+              for (c of classes){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE._text == c.CLASS_CODE._text){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE = new Date(c.CLASS_END_DATE) < new Date(submission_date) ? c.CLASS_END_DATE : submission_date
+                  crs_change_enddate_counter += 1
+                }
+              }
+            }
+
+            // If the course indicator flag is set differently for some courses
+            if (crs_indicator_flag){
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE._text == crs_ind_code) {
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_SEM_TYPE._text != crs_ind_change){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_SEM_TYPE._text = crs_ind_change
+                }
+              }
+            }
           }
           else {
             for ( cls in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT ){
@@ -625,6 +752,25 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                   if (enr_enddate < crs_enddate){
                     jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE = students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE
                     crs_change_enddate_counter += 1
+                  }
+                }
+              }
+
+              // Class complete/incomplete and not all values have been entered.
+              if ((students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text == 'T' || students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_INCOMPLETE_FLAG._text == 'T') && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE).length == 0){
+                for (c of classes){
+                  if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].CLASS_CODE._text == c.CLASS_CODE._text){
+                    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE = new Date(c.CLASS_END_DATE) < new Date(submission_date) ? c.CLASS_END_DATE : submission_date
+                    crs_change_enddate_counter += 1
+                  }
+                }
+              }
+
+              // If the course indicator flag is set differently for some courses
+              if (crs_indicator_flag){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].CLASS_CODE._text == crs_ind_code) {
+                  if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_SEM_TYPE._text != crs_ind_change){
+                    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_SEM_TYPE._text = crs_ind_change
                   }
                 }
               }
