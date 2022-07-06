@@ -26,19 +26,25 @@ const ps_rows = ps_data.split('\n')
 const onsis_students = []
 const ps_students = []
 
+var onsis_og_count = 0
+var ps_og_count = 0
+
+
+// Collect all the student reported in OnSIS Extract
 for (var row in onsis_rows){
-    if (row < 3) continue
     const columns = onsis_rows[row].split(',')
-    if (columns[1]) {
+    if (columns[0] == '"DT"') {
         columns[8] = columns[8].replaceAll('"','')
-        columns[16] = parseInt(columns[16].replaceAll('"', ''))
+        columns[16] = columns[16].replaceAll('"', '').replaceAll(' ','')
         // check for exited students
-        if (!columns[16]){
+        if (columns[16] == ''){
             onsis_students.push([columns[1], columns[8]])
         }
     }
 }
+onsis_og_count = onsis_students.length
 
+// Collect all the students reported in PowerSchool Report
 for (var row in ps_rows) {
     if (row < 1) continue
     const columns = ps_rows[row].split(',')
@@ -48,41 +54,30 @@ for (var row in ps_rows) {
         ps_students.push([columns[4], columns[3]])
     }
 }
+ps_og_count = ps_students.length
 
-
-if (onsis_students.length > ps_students.length) {
-    for (s_on of onsis_students) {
-        var match = false
-        var count = 0
-        while (!match && count < ps_students.length) {
-            if (s_on[0] == ps_students[count][0]){
-                match = true
-            }
-            count++
-        }
-
-        if (!match) {
-            console.log('Non Matching Student: ' + s_on[0] + ' Grade: ' + s_on[1])
-        }
-    }
-}
-else if (ps_students.length > onsis_students.length) {
-    for (s_on of ps_students) {
-        var match = false
-        var count = 0
-        while (!match && count < onsis_students.length) {
-            if (s_on[0] == onsis_students[count][0]){
-                match = true
-            }
-            count++
-        }
-
-        if (!match) {
-            console.log('Non Matching Student: ' + s_on[0] + ' Grade: ' + s_on[1])
+// Remove all the matches
+for(var x=0;x<onsis_students.length;x++){
+    for(var y=0;y<ps_students.length;y++){
+        if (onsis_students[x][0]==ps_students[y][0]){
+            ps_students.splice(y,1);
+            onsis_students.splice(x,1);
+            x--;
+            break;
         }
     }
 }
 
+// Display all the non-matching onsis students
+for(var x=0;x<onsis_students.length;x++){
+    console.log('Non Matching Student Onsis: ' + onsis_students[x][0] + ' Grade: ' + onsis_students[x][1]);
+}
 
-console.log('Total OnSIS Enrolments: ' + onsis_students.length)
-console.log('Total PowerSchool Enrolments: ' + ps_students.length)
+// Display all the non-matching powerschool students
+for(var y=0;y<ps_students.length;y++){
+    console.log('Non Matching Student Powerschool: ' + ps_students[y][0] + ' Grade: ' + ps_students[y][1]);
+}
+
+// Display the total students from both reports
+console.log('Total OnSIS Enrolments: ' + onsis_og_count)
+console.log('Total PowerSchool Enrolments: ' + ps_og_count)
