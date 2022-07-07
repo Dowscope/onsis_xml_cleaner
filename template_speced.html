@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Speced Errors</title>
+		<style>
+			table {
+				border-spacing: 0;
+			}
+			td {
+				border: 1px solid black;
+			}
+		</style>
+  </head>
+  <body>
+		<h1 style="text-align: center; margin-bottom: 2px;">Spec Ed Errors</h1>
+		<h5 style="text-align: center; margin: 0;">School: {{changes.bsid}} Submission Year: {{changes.submissionDate}} Submission Month: {{changes.subMonth}}</h5>
+		<h2>The following students are reported in OnSIS</h2>
+		<table style="border: 1px solid black;">
+			<thead>
+				<td style="font-weight: bold;text-align: center;" width="150px">OEN</td>
+                <td style="font-weight: bold;text-align: center;" width="150px">Exception</td>
+                <td style="font-weight: bold;text-align: center;" >Placement</td>
+                <td style="font-weight: bold;text-align: center;" >IPRC Date</td>
+                <td style="font-weight: bold;text-align: center;" >Main Flag</td>
+                <td style="font-weight: bold;text-align: center;" >NonExc Flag</td>
+                <td style="font-weight: bold;text-align: center;" >IPRC Flag</td>
+                <td style="font-weight: bold;text-align: center;" >IEP Flag</td>
+			</thead>
+			{{#each changes.onsis_changes}}
+			<tr style="border: 1px solid black;">
+                <td style="text-align: center;">{{this.OEN}}</td>
+                <td style="text-align: center;">{{this.Exception}}</td>
+                <td style="text-align: center;">{{this.Placement}}</td>
+                <td style="text-align: center;">{{this.IPRCDate}}</td>
+                <td style="text-align: center;">{{this.MainFlag}}</td>
+                <td style="text-align: center;">{{this.IdentityFlag}}</td>
+				<td style="text-align: center;">{{this.IPRCFlag}}</td>
+                <td style="text-align: center;">{{this.IEPFlag}}</td>
+			</tr>
+				{{/each}}
+		</table>
+        <h2>The following students are reported in Powerschool</h2>
+		<table style="border: 1px solid black;">
+			<thead>
+				<td style="font-weight: bold;text-align: center;" width="150px">OEN</td>
+                <td style="font-weight: bold;text-align: center;" width="150px">Exception</td>
+                <td style="font-weight: bold;text-align: center;" >Placement</td>
+                <td style="font-weight: bold;text-align: center;" >Main Flag</td>
+                <td style="font-weight: bold;text-align: center;" >IEP Flag</td>
+			</thead>
+			{{#each changes.ps_changes}}
+			<tr style="border: 1px solid black;">
+                <td style="text-align: center;">{{this.OEN}}</td>
+                <td style="text-align: center;">{{this.Exception}}</td>
+                <td style="text-align: center;">{{this.Placement}}</td>
+                <td style="text-align: center;">{{this.MainFlag}}</td>
+                <td style="text-align: center;">{{this.IEPFlag}}</td>
+			</tr>
+				{{/each}}
+		</table>
+		<div class="footer">
+			<p>
+			</p>
+		</div>
+  </body>
+</html>

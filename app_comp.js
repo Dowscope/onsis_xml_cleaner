@@ -5,7 +5,7 @@
 const arg = process.argv.slice(2)
 
 if (arg.length > 5){
-  console.log('File Path, OnSIS Extract FileName, PS Extract FileName.  ie. c:\\onsis\\ algo_se algo_ps')
+  console.log('File Path, OnSIS Extract FileName, PS Extract FileName.  ie. c:\\onsis\\ algo_se.csv algo_ps.csv')
   process.exit(0)
 }
 
@@ -34,10 +34,11 @@ var ps_og_count = 0
 for (var row in onsis_rows){
     const columns = onsis_rows[row].split(',')
     if (columns[0] == '"DT"') {
+        columns[7] = parseInt(columns[7].replaceAll('"',''))
         columns[8] = columns[8].replaceAll('"','')
         columns[16] = columns[16].replaceAll('"', '').replaceAll(' ','')
         // check for exited students
-        if (columns[16] == ''){
+        if (columns[16] == '' && columns[7] != 8){
             onsis_students.push([columns[1], columns[8]])
         }
     }
