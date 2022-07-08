@@ -107,7 +107,7 @@ const ps_students_count = ps_students.length
 // Remove all the matches
 for(var x=0;x<onsis_students.length;x++){
     for(var y=0;y<ps_students.length;y++){
-        if (onsis_students[x]==ps_students[y]){
+        if (onsis_students[x].OEN==ps_students[y].OEN){
             ps_students.splice(y,1);
             onsis_students.splice(x,1);
             x--;
