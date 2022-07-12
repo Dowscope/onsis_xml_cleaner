@@ -36,7 +36,7 @@ These storecodes are needed so that the <REPORT_CARD> segment of the OnSIS file 
 ## To run
 
 ```bash
-node storecodes.js schoolcode
+node storecodes.js c:\onsis\ schoolcode
 ```
 
 The school code will be the bsid number or the shortcode of the school you are working on.
