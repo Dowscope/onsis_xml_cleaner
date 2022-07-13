@@ -9,7 +9,7 @@ const arg = process.argv.slice(2)
 
 // Check if both arhuments have been added
 if (arg.length != 2){
-  console.log('File Path, School Code.  ie. c:\\onsis\\ ALGO')
+  console.log('File Path, School Code ie. c:\\onsis\\ ALGO simple')
   console.log('Make sure the file name is this format: standard_grade_section_export_<SCHOOLCODE>.csv')
   process.exit(0)
 }
@@ -17,6 +17,7 @@ if (arg.length != 2){
 const directory_path = arg[0]
 const ps_extract = directory_path + 'standard_grade_section_export_' + arg[1] + '.csv'
 const school_code = arg[1].toUpperCase()
+
 
 // Set to the existing term storecodes in PoerSchool
 const termone_code = 'I1'
@@ -43,7 +44,7 @@ for (row in ps_rows) {
 
     // The first row is the header row.  Change to zero if there is no header
     if (row < 1){
-        results.push(ps_rows[row].split(',').splice(0,7))
+        results.push(ps_rows[row].split(',').splice(0,15))
         continue
     }
 
@@ -56,13 +57,13 @@ for (row in ps_rows) {
         columns[4] = 'R1'
         termone_count += 1
         count += 1
-        results.push(columns.splice(0,7))
+        results.push(columns.splice(0,15))
     }
     else if (columns[4] == termtwo_code){
         columns[4] = 'R2'
         termtwo_count += 1
         count += 1
-        results.push(columns.splice(0,7))      
+        results.push(columns.splice(0,15)) 
     }
 }
 
