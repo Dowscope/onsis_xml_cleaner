@@ -13,8 +13,6 @@ if (arg.length > 5){
 const xmljs = require('xml-js')
 const fs = require('fs')
 const pdf = require('pdf-creator-node')
-const { parse } = require('path')
-const { setMaxListeners } = require('events')
 
 // School and Period Information
 const school_bsid = arg[1]
@@ -43,7 +41,7 @@ if (school_level == 'ELEM') {
     back_date = sub_date + '/04/01'
     submission_date = sub_date + '/06/30'
     onsis_p = onsis_p + '4'
-    sub_date = sub_date + '0628'
+    sub_date = sub_date + '0630'
   }
 }
 else if (school_level == 'SEC'){
