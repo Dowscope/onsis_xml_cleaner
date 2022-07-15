@@ -1,12 +1,23 @@
+// REA Submission CSV Cleaner
+
+// Get command line arguments
+const arg = process.argv.slice(2)
+
+// Check if both arhuments have been added
+if (arg.length != 4){
+  console.log('File Path, Submission Year, Submission Month, FileName ie. c:\\onsis 20212022 MAR filename.csv')
+  process.exit(0)
+}
+
 const csv = require('csv-parser')
 const csvstr = require('csv')
 const fs = require('fs')
 
-const rea_period = 'OCT'
-const rea_year = '20212022'
+const rea_period = arg[2].toUpperCase()
+const rea_year = arg[1]
 
-const file_dir = 'C:\\rea\\'
-const file_name = '20212022_REA_Oct_Submission_CSV.csv' 
+const file_dir = arg[0] + '\\'
+const file_name = arg[3]
 const file_path = file_dir + file_name
 
 const output_file = file_dir + rea_year + '_REA_' + rea_period + '_Submission.csv'
@@ -20,52 +31,39 @@ var results = []
 for (r in rows){
     if (r > 9){
         var columns = rows[r].split(',')
-        if (columns[1] && columns[1].length < 9){
-            columns[1] = '0' + columns[1]
+        if (columns[1]){
+            columns[1] = columns[1].replaceAll(' ', '').replaceAll('"', '')
+            if (columns[1].length < 9){
+                columns[1] = '0' + columns[1]
+            }
         }
 
         if (columns[4]){
             var dob = columns[4].split('/')
-            var mm = 0, dd = 0, yy = 0
-            for (d in dob){
-                if (dob[d].length > 3) {
-                    yy = dob[d]
-                }
-                else if (dob[d] > 12) {
-                    dd = dob[d]
-                }
-                else if (d == 1 && dob[d] < 13) {
-                    mm = dob[d]
-                }
-                else if (mm == 0) {
-                    mm = dob[d]
-                }
-                else {
-                    dd = dob[d]
-                }
+            var mm = dob[0]
+            var dd = dob[1]
+            var yy = dob[2]
+            
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+            if (mm < 10) {
+                mm = '0' + mm
             }
             columns[4] = yy + '/' + mm + '/' + dd
         }
 
         if (columns[9]){
             var dob = columns[9].split('/')
-            var mm = 0, dd = 0, yy = 0
-            for (d in dob){
-                if (dob[d].length > 3) {
-                    yy = dob[d]
-                }
-                else if (dob[d] > 12) {
-                    dd = dob[d]
-                }
-                else if (d == 1 && dob[d] < 13) {
-                    mm = dob[d]
-                }
-                else if (mm == 0) {
-                    mm = dob[d]
-                }
-                else {
-                    dd = dob[d]
-                }
+            var mm = dob[0]
+            var dd = dob[1]
+            var yy = dob[2]
+            
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+            if (mm < 10) {
+                mm = '0' + mm
             }
             columns[9] = yy + '/' + mm + '/' + dd
         }
