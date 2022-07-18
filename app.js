@@ -927,7 +927,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
               if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE < new Date(submission_date))){
                 for (lna in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
-                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION._text = '000.00'
                 }
                 second_language_counter += 1
               }
@@ -936,7 +936,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           else {
             if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
               if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE < new Date(submission_date))){
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text = '000.00'
                 second_language_counter += 1
               }
             }
