@@ -142,23 +142,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Student Changes - Student Number
   // Students with IA codes.
   const student_ia_fixes = [
-    '330251687',
-    '330260407',
-    '330266065',
-    '330274739',
-    '330281015',
-    '330282625',
-    '330306945',
-    '330307869',
-    '330328386',
-    '359035482',
-    '359053799',
-    '359054210',
-    '359060183',
-    '359078531',
-    '359092236',
-    '72172281',
-    '359124143',
+    '330340514',
+    '330370883',
+    '359008935',
+    '359061488',
+    '359094042',
+    '359103198',
+    '359123743',
   ]
 
   // Students that are missing a entry code.
@@ -171,28 +161,17 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
-    '330289836'
+    '330370883',
+    '359008935',
+    '359032645',
+    '359061488',
+    '359094042',
+    '359123637',
+    '359123743',
   ]
 
   // Students should be ADD not UPDATE
   const student_status_add = [
-    '330251687',
-    '330260407',
-    '330266065',
-    '330274739',
-    '330281015',
-    '330282625',
-    '330306945',
-    '330307869',
-    '330328386',
-    '359035482',
-    '359053799',
-    '359054210',
-    '359060183',
-    '359078531',
-    '359092236',
-    '72172281',
-    '359124143',
   ]
 
   // Students need status change
@@ -203,6 +182,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong postal code.
   const student_postal_fixes = [
+    '359124185'
   ]
 
   // Students class start date removed when ACTION is update
@@ -211,21 +191,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Error showing language type of 34
   const class_lang_type_fixes = [
-    '330259417',
-    '330263864',
-    '330265984',
-    '330271461',
-    '330277476',
-    '330287624',
-    '330294307',
-    '330304783',
-    '330344557',
-    '359017266',
-    '359047016',
-    '359082666',
-    '359089646',
-    '330218595',
-    '359123458',
   ]
 
   // Error with class start date and should be removed.
@@ -234,8 +199,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Weird error change with course end date exceeding submission date.
   const student_crs_exceed = [
-    '359123654',
-    '359123655',
   ]
   const date_exceeded = '2022/03/31'
   const change_date = '2022/03/30'
@@ -378,9 +341,11 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
     student_counter += 1
 
-    // ----- Manual Changes -----
-
+    
     if (students[s].STUDENT_SCHOOL_ENROLMENT){
+
+      // ----- Manual Changes -----
+
       // Status Change to add
       for (student_number in student_status_add){
         if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_status_add[student_number]){
@@ -958,19 +923,37 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   
         // Change the second language minutes to 40 when it has been recorded as 0
         if (key == 'SECOND_LANGUAGE_PROGRAM') {
-          if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM).length = 3){
-            if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text == '000.00') {
-              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
-              second_language_counter += 1
-            }
-          }else {
-            for (sl in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
-              if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION._text == '000.00') {
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
+              if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE < new Date(submission_date))){
+                for (lna in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION._text = '000.00'
+                }
                 second_language_counter += 1
               }
             }
           }
+          else {
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
+              if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE < new Date(submission_date))){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text = '000.00'
+                second_language_counter += 1
+              }
+            }
+          }
+        //   if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM).length = 3){
+        //     if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text == '000.00') {
+        //       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
+        //       second_language_counter += 1
+        //     }
+        //   }else {
+        //     for (sl in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
+        //       if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION._text == '000.00') {
+        //         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
+        //         second_language_counter += 1
+        //       }
+        //     }
+        //   }
         }
       }
     }
@@ -1026,10 +1009,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     }
 
     // Educator that is TEACHER REGULAR core flag wrong.
-    if (educators[e].POSITION_TYPE && educators[e].POSITION_TYPE._text == 'TEA') {
+    if (educators[e].POSITION_TYPE && (educators[e].POSITION_TYPE._text == 'TEA' || (educators[e].NEW_POSITION_TYPE && educators[e].NEW_POSITION_TYPE._text == 'TEA'))) {
       if (school_level == 'ELEM'){
         // Core flag is False and they are not on leave correction.
-        if (educators[e].CORE_FLAG && educators[e].CORE_FLAG._text == 'F' && !educators[e].NEW_EDUCATOR_LEAVE_TYPE && !educators[e].NEW_ASSIGNMENT_WTHD_TYPE) {
+        if (educators[e].CORE_FLAG && educators[e].CORE_FLAG._text == 'F' && !educators[e].NEW_EDUCATOR_LEAVE_TYPE && !educators[e].NEW_ASSIGNMENT_WTHD_TYPE && educators[e].TEACHING_TYPE._text != 'N/A') {
+          if (educators[e].NEW_POSITION_TYPE && educators[e].NEW_POSITION_TYPE._text == 'SPE'){
+            break
+          }
           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CORE_FLAG._text = 'T'
           change_log.push({
             'MEN': educators[e].MEN._text,
@@ -1045,7 +1031,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             'Desc': 'Educator has teaching type of TEACHER REGULAR, Educator is on leave but still attached to a class'
           });
           educator_core_counter += 1
-          if (educators[e].TEACHING_TYPE != 'N/A') {
+          if (educators[e].TEACHING_TYPE._text != 'N/A') {
             jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].TEACHING_TYPE._text = 'N/A' 
             change_log.push({
               'MEN': educators[e].MEN._text,
