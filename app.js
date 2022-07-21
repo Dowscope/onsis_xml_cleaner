@@ -23,6 +23,10 @@ var onsis_p
 var back_date
 var submission_date
 
+// Set Last day of school in June
+const last_day = '/06/28'
+const last_sub_day = '0628'
+
 if (school_level == 'ELEM') {
   onsis_p = sub_month + 'ELEM'
   if (sub_month == 'OCT') {
@@ -39,9 +43,9 @@ if (school_level == 'ELEM') {
   }
   else if (sub_month == 'JUN') {
     back_date = sub_date + '/04/01'
-    submission_date = sub_date + '/06/30'
+    submission_date = sub_date + last_day
     onsis_p = onsis_p + '4'
-    sub_date = sub_date + '0630'
+    sub_date = sub_date + last_sub_day
   }
 }
 else if (school_level == 'SEC'){
@@ -60,9 +64,9 @@ else if (school_level == 'SEC'){
   }
   else if (sub_month == 'JUN') {
     back_date = sub_date + '/03/01'
-    submission_date = sub_date + '/06/30'
+    submission_date = sub_date + last_day
     onsis_p += '4'
-    sub_date = sub_date + '0628'
+    sub_date = sub_date + last_sub_day
   }
 }
 else {
@@ -142,13 +146,9 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Student Changes - Student Number
   // Students with IA codes.
   const student_ia_fixes = [
-    '330340514',
-    '330370883',
-    '359008935',
-    '359061488',
-    '359094042',
-    '359103198',
-    '359123743',
+    '330320573',
+    '359033263',
+    '359123501',
   ]
 
   // Students that are missing a entry code.
@@ -161,13 +161,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
-    '330370883',
-    '359008935',
-    '359032645',
-    '359061488',
-    '359094042',
-    '359123637',
-    '359123743',
   ]
 
   // Students should be ADD not UPDATE
@@ -182,7 +175,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong postal code.
   const student_postal_fixes = [
-    '359124185'
   ]
 
   // Students class start date removed when ACTION is update
@@ -921,39 +913,118 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           }
         }
   
-        // Change the second language minutes to 40 when it has been recorded as 0
+        // Change the second language
         if (key == 'SECOND_LANGUAGE_PROGRAM') {
+
+          
           if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
-            if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
-              if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE < new Date(submission_date))){
-                for (lna in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
-                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION._text = '000.00'
+            const sl_prog = []
+            for (lna in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
+              
+              // If the student has retired from the school, remove second language
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
+                if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE < new Date(submission_date))){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].ACTION._text = 'DELETE'
+                  second_language_counter += 1
                 }
-                second_language_counter += 1
               }
+
+              // Remove duplicates
+              
+              if (sl_prog.length > 0){
+                for (p of sl_prog){
+                  if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].TYPE && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].TYPE._text == p[0]){
+                    if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION._text == p[1]){
+                      delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna]
+                      second_language_counter += 1
+                    }
+                  }
+                }
+              }
+              else {
+                var prog = []
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna]){
+                  if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].TYPE && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION){
+                    prog = [
+                      students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].TYPE._text,
+                      students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].MINUTES_PER_DAY_OF_INSTRUCTION._text
+                    ]
+                    sl_prog.push(prog)
+                  }
+                  else {
+                    delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna]
+                    second_language_counter += 1
+                  }
+                }
+              }
+
             }
           }
           else {
             if (students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE).length > 0){
               if (new Date(students[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_END_DATE < new Date(submission_date))){
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text = '000.00'
+                delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM
                 second_language_counter += 1
               }
             }
           }
-        //   if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM).length = 3){
-        //     if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text == '000.00') {
-        //       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
-        //       second_language_counter += 1
-        //     }
-        //   }else {
-        //     for (sl in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
-        //       if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION._text == '000.00') {
-        //         jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[sl].MINUTES_PER_DAY_OF_INSTRUCTION._text = '040.00'
-        //         second_language_counter += 1
-        //       }
-        //     }
-        //   }
+
+          // remove empty records
+          var tempArry = [];
+          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
+            for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM) {
+              i && tempArry.push(i);
+            }
+          }
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM = tempArry;
+        }
+
+        // Make Changes based on Report Card
+        if (key == 'REPORT_CARD'){
+          if(Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.REPORT_CARD.TERM)){
+            for (t in students[s].STUDENT_SCHOOL_ENROLMENT.REPORT_CARD.TERM){
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.REPORT_CARD.TERM[t].TERM_CODE._text == '2'){
+                if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.REPORT_CARD.TERM[t].SUBJECT_STRAND)){
+                  for (strand in students[s].STUDENT_SCHOOL_ENROLMENT.REPORT_CARD.TERM[t].SUBJECT_STRAND){
+                    if (students[s].STUDENT_SCHOOL_ENROLMENT.REPORT_CARD.TERM[t].SUBJECT_STRAND[strand].SUBJECT_STRAND_CODE._text == 'NLA-10'){
+                      if (students[s].STUDENT_SCHOOL_ENROLMENT.REPORT_CARD.TERM[t].SUBJECT_STRAND[strand].NA_FLAG._text == 'T'){
+                        if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
+                          if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
+                            for (lna in students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM) {
+                              if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].TYPE._text == '021'){
+                                if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].ACTION._text == 'UPDATE'){
+                                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna].ACTION._text = 'DELETE'
+                                }
+                                else {
+                                  delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[lna]
+                                }
+                              }
+                            }
+                          }
+                          else {
+                            if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.ACTION._text == 'UPDATE'){
+                              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.ACTION._text = 'DELETE'
+                            }
+                            else {
+                              delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  var tempArry = [];
+                  if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
+                    for (let i of jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM) {
+                      i && tempArry.push(i);
+                    }
+                  }
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM = tempArry;
+                }
+              }
+            }
+          }
         }
       }
     }

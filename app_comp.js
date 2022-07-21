@@ -49,10 +49,10 @@ onsis_og_count = onsis_students.length
 for (var row in ps_rows) {
     if (row < 1) continue
     const columns = ps_rows[row].split(',')
-    if (columns[3]) {
-        columns[4] = columns[4].replaceAll('"','')
-        columns[3] = columns[3].replaceAll('"','')
-        ps_students.push([columns[4], columns[3]])
+    if (columns[2]) {
+        columns[4] = 0//columns[4].replaceAll('"','')
+        columns[2] = columns[2].replaceAll('"','')
+        ps_students.push([columns[2], columns[4]])
     }
 }
 ps_og_count = ps_students.length
