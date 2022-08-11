@@ -63,9 +63,9 @@ else if (school_level == 'SEC'){
     sub_date = sub_date + '0331'
   }
   else if (sub_month == 'JUN') {
-    back_date = sub_date + '/03/01'
+    back_date = sub_date + '/04/01'
     submission_date = sub_date + last_day
-    onsis_p += '4'
+    onsis_p += '1'
     sub_date = sub_date + last_sub_day
   }
 }
@@ -146,9 +146,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Student Changes - Student Number
   // Students with IA codes.
   const student_ia_fixes = [
-    '330320573',
-    '359033263',
-    '359123501',
   ]
 
   // Students that are missing a entry code.
@@ -196,7 +193,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const change_date = '2022/03/30'
 
   // Not all course indicators are the same.
-  const crs_indicator_flag = true
+  const crs_indicator_flag = false
   const crs_ind_code = 'SAM'
   const crs_ind_change = '3'
 
@@ -630,7 +627,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT).length > 20){
             
             // Passing mark and complete flag error.
-            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK).length > 0 && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE._text != 'W'){
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK).length > 0 && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE._text != 'W' && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE._text != 'D'){
               if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text == 'F'){
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text = 'T'
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_INCOMPLETE_FLAG._text = 'F'
@@ -643,6 +640,12 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               const mark = parseInt(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK._text)
               if (mark >= 50 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE._text == '0.00'){
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE = students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CREDIT_VALUE
+                crs_credit_counter += 1
+              }
+
+              // if mark is less then passing mark, earned credit should be zero.
+              if (mark < 50 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE._text != '0.00') {
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE._text = "0.00"
                 crs_credit_counter += 1
               }
             }
@@ -682,10 +685,10 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             for ( cls in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT ){
   
               // Passing mark and complete flag error.
-              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK).length > 0 && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE._text != 'W'){
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK).length > 0 && Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE).length > 0 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE._text != 'W' && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE._text != 'D'){
                 if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text == 'F'){
                   jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text = 'T'
-                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_INCOMPLETE_FLAG._text = 'T'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_INCOMPLETE_FLAG._text = 'F'
                   crs_complete_counter += 1
                 }
               }
@@ -695,6 +698,12 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                 const mark = parseInt(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK._text)
                 if (mark >= 50 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].EARNED_CREDIT_VALUE._text == '0.00'){
                   jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].EARNED_CREDIT_VALUE = students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].CREDIT_VALUE
+                  crs_credit_counter += 1
+                }
+
+                // if mark is less then passing mark, earned credit should be zero.
+                if (mark < 50 && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].EARNED_CREDIT_VALUE._text != '0.00') {
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].EARNED_CREDIT_VALUE._text = "0.00"
                   crs_credit_counter += 1
                 }
               }

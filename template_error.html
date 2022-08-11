@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>OnSIS Incident Errors</title>
+		<style>
+			table {
+				border-spacing: 0;
+			}
+			td {
+				border: 1px solid black;
+			}
+		</style>
+  </head>
+  <body>
+		<h1 style="text-align: center; margin-bottom: 2px;">OnSIS Incident Errors</h1>
+		<h5 style="text-align: center; margin: 0;">School: {{changes.bsid}} Submission Year: {{changes.submissionDate}} Submission Month: {{changes.subMonth}}</h5>
+		<h2>Please fix the following incident errors in PowerSchool</h2>
+		<table style="border: 1px solid black;">
+			<thead>
+				<td style="font-weight: bold;text-align: center;" width="150px">Incident ID</td>
+				<td style="font-weight: bold;text-align: center;" width="150px">Error</td>
+				<td style="font-weight: bold;text-align: center;" width="150px">Value</td>
+				<td style="font-weight: bold;text-align: center;">Description of Error</td>
+			</thead>
+			{{#each changes.changes}}
+			<tr style="border: 1px solid black;">
+				<td style="text-align: center;">{{this.ErrorID}}</td>
+				<td style="text-align: center;">{{this.Error}}</td>
+				<td style="text-align: center;">{{this.Value}}</td>
+				<td>{{this.Desc}}</td>
+			</tr>
+				{{/each}}
+		</table>
+		<div class="footer">
+			<p></p>
+		</div>
+  </body>
+</html>

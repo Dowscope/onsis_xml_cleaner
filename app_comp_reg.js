@@ -1,5 +1,6 @@
-// OnSIS compare
-// Will compare the OnSIS student extract file, with PowerSchool Extract.
+// OnSIS compare 2
+// Will compare the Powerschool REG file, with Onsis Extract.  You will need to convert the pdf to a 
+// csv file.
 
 // Get command line arguments
 const arg = process.argv.slice(2)
@@ -19,7 +20,7 @@ const onsis_data = fs.readFileSync(onsis_extract, 'utf-8')
 const ps_data = fs.readFileSync(ps_extract, 'utf-8')
 
 const onsis_rows = onsis_data.split('\r\n')
-const ps_rows = ps_data.split('\n')
+const ps_rows = ps_data.split('\r\n')
 
 const onsis_students = []
 const ps_students = []
@@ -32,11 +33,12 @@ var ps_og_count = 0
 for (var row in onsis_rows){
     const columns = onsis_rows[row].split(',')
     if (columns[0] == '"DT"') {
-        columns[7] = parseInt(columns[7].replaceAll('"',''))
-        columns[8] = columns[8].replaceAll('"','')
+        columns[8] = parseInt(columns[8].replaceAll('"',''))
+        columns[9] = columns[9].replaceAll('"','')
         columns[16] = columns[16].replaceAll('"', '').replaceAll(' ','')
+        columns[10] = columns[10].replaceAll('"', '').replaceAll(' ','')
         // check for exited students
-        if (columns[16] == '' && columns[7] != 8){
+        if (columns[16] == '' && columns[10] == 'FT'){
             onsis_students.push([columns[1], columns[8]])
         }
     }
@@ -45,12 +47,17 @@ onsis_og_count = onsis_students.length
 
 // Collect all the students reported in PowerSchool Report
 for (var row in ps_rows) {
-    if (row < 1) continue
     const columns = ps_rows[row].split(',')
-    if (columns[2]) {
-        columns[4] = 0//columns[4].replaceAll('"','')
-        columns[2] = columns[2].replaceAll('"','')
-        ps_students.push([columns[2], columns[4]])
+    if (columns[0] && columns[0].slice(0,3) != 'OEN') {
+        columns[0] = columns[0].replaceAll('"','')
+        columns[0] = columns[0].slice(0,9)
+        columns[14] = columns[14].replaceAll('"','')
+        columns[31] = columns[31].replaceAll('"','')
+        // console.log(columns)
+        
+        if (parseInt(columns[32])>210){
+            ps_students.push([columns[0], columns[14]])
+        }
     }
 }
 ps_og_count = ps_students.length
