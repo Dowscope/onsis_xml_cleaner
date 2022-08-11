@@ -16,8 +16,6 @@ const report_year = arg[3]
 const sub_month = arg[4].toUpperCase()
 const school_bsid = arg[5]
 
-const csv = require('csv-parser')
-const csvstr = require('csv')
 const fs = require('fs')
 const pdf = require('pdf-creator-node')
 
