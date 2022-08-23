@@ -19,13 +19,15 @@
 		<table style="border: 1px solid black;">
 			<thead>
 				<td style="font-weight: bold;text-align: center;" width="150px">Incident ID</td>
+				<td style="font-weight: bold;text-align: center;" width="150px">Section</td>
 				<td style="font-weight: bold;text-align: center;" width="150px">Error</td>
-				<td style="font-weight: bold;text-align: center;" width="150px">Value</td>
+				<td style="font-weight: bold;text-align: center;">Value</td>
 				<td style="font-weight: bold;text-align: center;">Description of Error</td>
 			</thead>
 			{{#each changes.changes}}
 			<tr style="border: 1px solid black;">
 				<td style="text-align: center;">{{this.ErrorID}}</td>
+				<td style="text-align: center;">{{this.Section}}</td>
 				<td style="text-align: center;">{{this.Error}}</td>
 				<td style="text-align: center;">{{this.Value}}</td>
 				<td>{{this.Desc}}</td>

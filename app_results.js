@@ -28,7 +28,7 @@ if (arg[2] && arg[2].toUpperCase() == 'SUSP') {
 }
 
 // Function to print Errors and return a row
-function printError(id, section, error, crs_code){
+function printError(id, section, error, crs_code, sus=null){
   var new_rows = []
   if (Object.keys(error).length < 1) {
     return new_rows
@@ -52,6 +52,11 @@ function printError(id, section, error, crs_code){
       else {
         msg = error.ERROR[e].E_MESSAGE._text
       }
+
+      if (sus){
+        msg += ' -- Student OEN: ' + sus
+      }
+
       if (error.ERROR[e].E_MESSAGE._text != 'Parent entry in error'){
         // console.log('ID: ' + id)
         row.push(section)
@@ -76,12 +81,17 @@ function printError(id, section, error, crs_code){
       fieldValue = error.ERROR.FIELD_VALUE._text
     }
     var msg = ''
-      if (crs_code){
-        msg = 'Class: ' + crs_code._text + ' | ' + error.ERROR.E_MESSAGE._text
-      }
-      else {
-        msg = error.ERROR.E_MESSAGE._text
-      }
+    if (crs_code){
+      msg = 'Class: ' + crs_code._text + ' | ' + error.ERROR.E_MESSAGE._text
+    }
+    else {
+      msg = error.ERROR.E_MESSAGE._text
+    }
+
+    if (sus){
+      msg += ' -- Student OEN: ' + sus
+    }
+
     var row = []
     if (error.ERROR.E_MESSAGE._text != 'Parent entry in error'){
       // console.log('ID: ' + id)
@@ -759,9 +769,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     var student_incident_counter = 0
     var student_infraction_counter = 0
     var student_outcome_counter = 0
+    var student_program_counter = 0
 
+    // If multiple incidents ------------------------------------------
     if (Array.isArray(incidents)){
       for (var i in incidents){
+
+        incident_counter++
 
         // Check for main errors
         if (Object.keys(incidents[i].DATA_ERROR_DETAILS).length > 0){
@@ -769,6 +783,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           for (var r of rows){
             results.push(r)
             results_pdf.push({
+              'Section': r[0],
               'ErrorID': r[1],
               'Error': r[2],
               'Value': r[3],
@@ -778,13 +793,152 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           incident_counter += 1
         }
 
-        if (Array.isArray(incidents[i].STUDENT_INCIDENT)){
-          for (var si in incidents[i].STUDENT_INCIDENT){
-            if (Object.keys(incidents[i].STUDENT_INCIDENT[si].DATA_ERROR_DETAILS).length > 0){
-              const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT[si].DATA_ERROR_DETAILS, null)
+        // Student Incidents
+        if (incidents[i].STUDENT_INCIDENT){
+
+          // Multiple Student Incidents
+          if (Array.isArray(incidents[i].STUDENT_INCIDENT)){
+            for (var si in incidents[i].STUDENT_INCIDENT){
+
+              // Incident Errors - Multiple Incident
+              if (Object.keys(incidents[i].STUDENT_INCIDENT[si].DATA_ERROR_DETAILS).length > 0){
+                const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT[si].DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT[si].OEN._text)
+                for (var r of rows){
+                  results.push(r)
+                  results_pdf.push({
+                    'Section': r[0],
+                    'ErrorID': r[1],
+                    'Error': r[2],
+                    'Value': r[3],
+                    'Desc': r[4],
+                  })
+                }
+                student_incident_counter += 1
+              }
+
+              // Infraction Errors - Multiple Incident
+              if (incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION){
+                if (Array.isArray(incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION)){
+                  for (var frac in incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION){
+                    if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
+                      const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT[si].OEN._text)
+                      for (var r of rows){
+                        results.push(r)
+                        results_pdf.push({
+                          'Section': r[0],
+                          'ErrorID': r[1],
+                          'Error': r[2],
+                          'Value': r[3],
+                          'Desc': r[4],
+                        })
+                      }
+                      student_infraction_counter += 1
+                    }
+                  }
+                }
+                else {
+                  if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT[si].OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_infraction_counter += 1
+                  }
+                }
+              }
+
+              // Outcome Errors - Multiple Incident
+              if (incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME){
+                if (Array.isArray(incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME)){
+                  for (var frac in incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME){
+                    if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS).length > 0){
+                      const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT[si].OEN._text)
+                      for (var r of rows){
+                        results.push(r)
+                        results_pdf.push({
+                          'Section': r[0],
+                          'ErrorID': r[1],
+                          'Error': r[2],
+                          'Value': r[3],
+                          'Desc': r[4],
+                        })
+                      }
+                      student_outcome_counter += 1
+                    }
+                  }
+                }
+                else {
+                  if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT[si].OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_outcome_counter += 1
+                  }
+                }
+              }
+  
+              // Program Errors - Multiple Incident
+              if (incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM){
+                if (Array.isArray(incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM)){
+                  for (var frac in incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM){
+                    if (Object.keys(incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS).length > 0){
+                      const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT[si].OEN._text)
+                      for (var r of rows){
+                        results.push(r)
+                        results_pdf.push({
+                          'Section': r[0],
+                          'ErrorID': r[1],
+                          'Error': r[2],
+                          'Value': r[3],
+                          'Desc': r[4],
+                        })
+                      }
+                      student_program_counter += 1
+                    }
+                  }
+                }
+                else {
+                  if (Object.keys(incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT[si].OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_program_counter += 1
+                  }
+                }
+              }
+            }
+          }
+          else {
+            // Incident Errors - Single Incident
+            if (Object.keys(incidents[i].STUDENT_INCIDENT.DATA_ERROR_DETAILS).length > 0){
+              const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT.DATA_ERROR_DETAILS, null)
               for (var r of rows){
                 results.push(r)
                 results_pdf.push({
+                  'Section': r[0],
                   'ErrorID': r[1],
                   'Error': r[2],
                   'Value': r[3],
@@ -793,13 +947,305 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
               student_incident_counter += 1
             }
-            if (Array.isArray(incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION)){
-              for (var frac in incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION){
-                if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
-                  const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null)
+
+            // Infraction Errors - Single Incident
+            if (incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION){
+              if (Array.isArray(incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION)){
+                for (var frac in incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION){
+                  if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT.OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_infraction_counter += 1
+                  }
+                }
+              }
+              else {
+                if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT.OEN._text)
                   for (var r of rows){
                     results.push(r)
                     results_pdf.push({
+                      'Section': r[0],
+                      'ErrorID': r[1],
+                      'Error': r[2],
+                      'Value': r[3],
+                      'Desc': r[4],
+                    })
+                  }
+                  student_infraction_counter += 1
+                }
+              }
+            }
+
+            // Outcome Errors - Single Incident
+            if (incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME){
+              if (Array.isArray(incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME)){
+                for (var out in incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME){
+                  if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT.OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_outcome_counter += 1
+                  }
+                }
+              }
+              else {
+                if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT.OEN._text)
+                  for (var r of rows){
+                    results.push(r)
+                    results_pdf.push({
+                      'Section': r[0],
+                      'ErrorID': r[1],
+                      'Error': r[2],
+                      'Value': r[3],
+                      'Desc': r[4],
+                    })
+                  }
+                  student_outcome_counter += 1
+                }
+              }
+            }
+
+            // Program Error - Single Incident
+            if (incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM){
+              if (Array.isArray(incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM)){
+                for (var frac in incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM){
+                  if (Object.keys(incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT.OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_program_counter += 1
+                  }
+                }
+              }
+              else {
+                if (Object.keys(incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS, null, incidents[i].STUDENT_INCIDENT.OEN._text)
+                  for (var r of rows){
+                    results.push(r)
+                    results_pdf.push({
+                      'Section': r[0],
+                      'ErrorID': r[1],
+                      'Error': r[2],
+                      'Value': r[3],
+                      'Desc': r[4],
+                    })
+                  }
+                  student_program_counter += 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    else {
+      incident_counter++
+
+      // Incident Error - Single Incident
+      if (Object.keys(incidents.DATA_ERROR_DETAILS).length > 0){
+        const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Incident Error', incidents.DATA_ERROR_DETAILS, null)
+        for (var r of rows){
+          results.push(r)
+          results_pdf.push({
+            'Section': r[0],
+            'ErrorID': r[1],
+            'Error': r[2],
+            'Value': r[3],
+            'Desc': r[4],
+          })
+        }
+        incident_counter += 1
+      }
+
+      // Student Incident Errors - Single Incident
+      if (incidents.STUDENT_INCIDENT) {
+
+        // Multiple Student Incidents - Single incident
+        if (Array.isArray(incidents.STUDENT_INCIDENT)){
+          for (var si in incidents.STUDENT_INCIDENT){
+            if (Object.keys(incidents.STUDENT_INCIDENT[si].DATA_ERROR_DETAILS).length > 0){
+              const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT[si].DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT[si].OEN._text)
+              for (var r of rows){
+                results.push(r)
+                results_pdf.push({
+                  'Section': r[0],
+                  'ErrorID': r[1],
+                  'Error': r[2],
+                  'Value': r[3],
+                  'Desc': r[4],
+                })
+              }
+              student_incident_counter += 1
+            }
+
+            // Infraction Errors
+            if (incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION){
+              if (Array.isArray(incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION)){
+                for (var frac in incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION){
+                  if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT[si].OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_infraction_counter += 1
+                  }
+                }
+              }
+              else {
+                if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT[si].OEN._text)
+                  for (var r of rows){
+                    results.push(r)
+                    results_pdf.push({
+                      'Section': r[0],
+                      'ErrorID': r[1],
+                      'Error': r[2],
+                      'Value': r[3],
+                      'Desc': r[4],
+                    })
+                  }
+                  student_infraction_counter += 1
+                }
+              }
+            }
+
+            // Outcome Errors
+            if (incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME){
+              if (Array.isArray(incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME)){
+                for (var frac in incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME){
+                  if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT[si].OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_outcome_counter += 1
+                  }
+                }
+              }
+              else {
+                if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT[si].OEN._text)
+                  for (var r of rows){
+                    results.push(r)
+                    results_pdf.push({
+                      'Section': r[0],
+                      'ErrorID': r[1],
+                      'Error': r[2],
+                      'Value': r[3],
+                      'Desc': r[4],
+                    })
+                  }
+                  student_outcome_counter += 1
+                }
+              }
+            }
+  
+            // Program Errors
+            if (incidents.STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM){
+              if (Array.isArray(incidents.STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM)){
+                for (var frac in incidents.STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM){
+                  if (Object.keys(incidents.STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS).length > 0){
+                    const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents.STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT[si].OEN._text)
+                    for (var r of rows){
+                      results.push(r)
+                      results_pdf.push({
+                        'Section': r[0],
+                        'ErrorID': r[1],
+                        'Error': r[2],
+                        'Value': r[3],
+                        'Desc': r[4],
+                      })
+                    }
+                    student_program_counter += 1
+                  }
+                }
+              }
+              else {
+                if (Object.keys(incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
+                  for (var r of rows){
+                    results.push(r)
+                    results_pdf.push({
+                      'Section': r[0],
+                      'ErrorID': r[1],
+                      'Error': r[2],
+                      'Value': r[3],
+                      'Desc': r[4],
+                    })
+                  }
+                  student_program_counter += 1
+                }
+              }
+            }
+          }
+        }
+        else {
+          if (Object.keys(incidents.STUDENT_INCIDENT.DATA_ERROR_DETAILS).length > 0){
+            const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT.DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
+            for (var r of rows){
+              results.push(r)
+              results_pdf.push({
+                'Section': r[0],
+                'ErrorID': r[1],
+                'Error': r[2],
+                'Value': r[3],
+                'Desc': r[4],
+              })
+            }
+            student_incident_counter += 1
+          }
+
+          // Infraction Errors
+          if (incidents.STUDENT_INCIDENT.STUDENT_INFRACTION){
+            if (Array.isArray(incidents.STUDENT_INCIDENT.STUDENT_INFRACTION)){
+              for (var frac in incidents.STUDENT_INCIDENT.STUDENT_INFRACTION){
+                if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents.STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
+                  for (var r of rows){
+                    results.push(r)
+                    results_pdf.push({
+                      'Section': r[0],
                       'ErrorID': r[1],
                       'Error': r[2],
                       'Value': r[3],
@@ -811,11 +1257,12 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
             }
             else {
-              if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
-                const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS, null)
+              if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
+                const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Infraction Error', incidents.STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
                 for (var r of rows){
                   results.push(r)
                   results_pdf.push({
+                    'Section': r[0],
                     'ErrorID': r[1],
                     'Error': r[2],
                     'Value': r[3],
@@ -825,13 +1272,18 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                 student_infraction_counter += 1
               }
             }
-            if (Array.isArray(incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME)){
-              for (var frac in incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME){
-                if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS).length > 0){
-                  const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS, null)
+          }
+
+          // Outcome Errors
+          if (incidents.STUDENT_INCIDENT.STUDENT_OUTCOME){
+            if (Array.isArray(incidents.STUDENT_INCIDENT.STUDENT_OUTCOME)){
+              for (var out in incidents.STUDENT_INCIDENT.STUDENT_OUTCOME){
+                if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents.STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
                   for (var r of rows){
                     results.push(r)
                     results_pdf.push({
+                      'Section': r[0],
                       'ErrorID': r[1],
                       'Error': r[2],
                       'Value': r[3],
@@ -843,11 +1295,12 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
             }
             else {
-              if (Object.keys(incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
-                const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS, null)
+              if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
+                const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Outcome Error', incidents.STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
                 for (var r of rows){
                   results.push(r)
                   results_pdf.push({
+                    'Section': r[0],
                     'ErrorID': r[1],
                     'Error': r[2],
                     'Value': r[3],
@@ -858,261 +1311,43 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
             }
           }
-        }
-        else {
-          if (Object.keys(incidents[i].STUDENT_INCIDENT.DATA_ERROR_DETAILS).length > 0){
-            const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT.DATA_ERROR_DETAILS, null)
-            for (var r of rows){
-              results.push(r)
-              results_pdf.push({
-                'ErrorID': r[1],
-                'Error': r[2],
-                'Value': r[3],
-                'Desc': r[4],
-              })
-            }
-            student_incident_counter += 1
-          }
-          if (Array.isArray(incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION)){
-            for (var frac in incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION){
-              if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
-                const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null)
-                for (var r of rows){
-                  results.push(r)
-                  results_pdf.push({
-                    'ErrorID': r[1],
-                    'Error': r[2],
-                    'Value': r[3],
-                    'Desc': r[4],
-                  })
-                }
-                student_infraction_counter += 1
-              }
-            }
-          }
-          else {
-            if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
-              const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS, null)
-              for (var r of rows){
-                results.push(r)
-                results_pdf.push({
-                  'ErrorID': r[1],
-                  'Error': r[2],
-                  'Value': r[3],
-                  'Desc': r[4],
-                })
-              }
-              student_infraction_counter += 1
-            }
-          }
-          if (Array.isArray(incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME)){
-            for (var out in incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME){
-              if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS).length > 0){
-                const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS, null)
-                for (var r of rows){
-                  results.push(r)
-                  results_pdf.push({
-                    'ErrorID': r[1],
-                    'Error': r[2],
-                    'Value': r[3],
-                    'Desc': r[4],
-                  })
-                }
-                student_outcome_counter += 1
-              }
-            }
-          }
-          else {
-            if (Object.keys(incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
-              const rows = printError(incidents[i].YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents[i].STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS, null)
-              for (var r of rows){
-                results.push(r)
-                results_pdf.push({
-                  'ErrorID': r[1],
-                  'Error': r[2],
-                  'Value': r[3],
-                  'Desc': r[4],
-                })
-              }
-              student_outcome_counter += 1
-            }
-          }
-        }
-      }
-    }
-    else {
-      // Check for main errors
-      if (Object.keys(incidents.DATA_ERROR_DETAILS).length > 0){
-        const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Incident Error', incidents.DATA_ERROR_DETAILS, null)
-        for (var r of rows){
-          results.push(r)
-          results_pdf.push({
-            'ErrorID': r[1],
-            'Error': r[2],
-            'Value': r[3],
-            'Desc': r[4],
-          })
-        }
-        incident_counter += 1
-      }
 
-      if (Array.isArray(incidents.STUDENT_INCIDENT)){
-        for (var si in incidents.STUDENT_INCIDENT){
-          if (Object.keys(incidents.STUDENT_INCIDENT[si].DATA_ERROR_DETAILS).length > 0){
-            const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT[si].DATA_ERROR_DETAILS, null)
-            for (var r of rows){
-              results.push(r)
-              results_pdf.push({
-                'ErrorID': r[1],
-                'Error': r[2],
-                'Value': r[3],
-                'Desc': r[4],
-              })
+          // Program Errors
+          if (incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM){
+            if (Array.isArray(incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM)){
+              for (var frac in incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM){
+                if (Object.keys(incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS).length > 0){
+                  const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
+                  for (var r of rows){
+                    results.push(r)
+                    results_pdf.push({
+                      'Section': r[0],
+                      'ErrorID': r[1],
+                      'Error': r[2],
+                      'Value': r[3],
+                      'Desc': r[4],
+                    })
+                  }
+                  student_program_counter += 1
+                }
+              }
             }
-            student_incident_counter += 1
-          }
-          if (Array.isArray(incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION)){
-            for (var frac in incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION){
-              if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
-                const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null)
+            else {
+              if (Object.keys(incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS).length > 0){
+                const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Program Error', incidents.STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM.DATA_ERROR_DETAILS, null, incidents.STUDENT_INCIDENT.OEN._text)
                 for (var r of rows){
                   results.push(r)
                   results_pdf.push({
+                    'Section': r[0],
                     'ErrorID': r[1],
                     'Error': r[2],
                     'Value': r[3],
                     'Desc': r[4],
                   })
                 }
-                student_infraction_counter += 1
+                student_program_counter += 1
               }
             }
-          }
-          else {
-            if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
-              const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT[si].STUDENT_INFRACTION.DATA_ERROR_DETAILS, null)
-              for (var r of rows){
-                results.push(r)
-                results_pdf.push({
-                  'ErrorID': r[1],
-                  'Error': r[2],
-                  'Value': r[3],
-                  'Desc': r[4],
-                })
-              }
-              student_infraction_counter += 1
-            }
-          }
-          if (Array.isArray(incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME)){
-            for (var frac in incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME){
-              if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS).length > 0){
-                const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME[frac].DATA_ERROR_DETAILS, null)
-                for (var r of rows){
-                  results.push(r)
-                  results_pdf.push({
-                    'ErrorID': r[1],
-                    'Error': r[2],
-                    'Value': r[3],
-                    'Desc': r[4],
-                  })
-                }
-                student_outcome_counter += 1
-              }
-            }
-          }
-          else {
-            if (Object.keys(incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
-              const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT[si].STUDENT_OUTCOME.DATA_ERROR_DETAILS, null)
-              for (var r of rows){
-                results.push(r)
-                results_pdf.push({
-                  'ErrorID': r[1],
-                  'Error': r[2],
-                  'Value': r[3],
-                  'Desc': r[4],
-                })
-              }
-              student_outcome_counter += 1
-            }
-          }
-        }
-      }
-      else {
-        if (Object.keys(incidents.STUDENT_INCIDENT.DATA_ERROR_DETAILS).length > 0){
-          const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT.DATA_ERROR_DETAILS, null)
-          for (var r of rows){
-            results.push(r)
-            results_pdf.push({
-              'ErrorID': r[1],
-              'Error': r[2],
-              'Value': r[3],
-              'Desc': r[4],
-            })
-          }
-          student_incident_counter += 1
-        }
-        if (Array.isArray(incidents.STUDENT_INCIDENT.STUDENT_INFRACTION)){
-          for (var frac in incidents.STUDENT_INCIDENT.STUDENT_INFRACTION){
-            if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS).length > 0){
-              const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT.STUDENT_INFRACTION[frac].DATA_ERROR_DETAILS, null)
-              for (var r of rows){
-                results.push(r)
-                results_pdf.push({
-                  'ErrorID': r[1],
-                  'Error': r[2],
-                  'Value': r[3],
-                  'Desc': r[4],
-                })
-              }
-              student_infraction_counter += 1
-            }
-          }
-        }
-        else {
-          if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS).length > 0){
-            const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT.STUDENT_INFRACTION.DATA_ERROR_DETAILS, null)
-            for (var r of rows){
-              results.push(r)
-              results_pdf.push({
-                'ErrorID': r[1],
-                'Error': r[2],
-                'Value': r[3],
-                'Desc': r[4],
-              })
-            }
-            student_infraction_counter += 1
-          }
-        }
-        if (Array.isArray(incidents.STUDENT_INCIDENT.STUDENT_OUTCOME)){
-          for (var out in incidents.STUDENT_INCIDENT.STUDENT_OUTCOME){
-            if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS).length > 0){
-              const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT.STUDENT_OUTCOME[out].DATA_ERROR_DETAILS, null)
-              for (var r of rows){
-                results.push(r)
-                results_pdf.push({
-                  'ErrorID': r[1],
-                  'Error': r[2],
-                  'Value': r[3],
-                  'Desc': r[4],
-                })
-              }
-              student_outcome_counter += 1
-            }
-          }
-        }
-        else {
-          if (Object.keys(incidents.STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS).length > 0){
-            const rows = printError(incidents.YOUR_REFERENCE_NUMBER._text, 'Student Incident Error', incidents.STUDENT_INCIDENT.STUDENT_OUTCOME.DATA_ERROR_DETAILS, null)
-            for (var r of rows){
-              results.push(r)
-              results_pdf.push({
-                'ErrorID': r[1],
-                'Error': r[2],
-                'Value': r[3],
-                'Desc': r[4],
-              })
-            }
-            student_outcome_counter += 1
           }
         }
       }
@@ -1123,6 +1358,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     console.log('Student Incident Errors: ' + student_incident_counter)
     console.log('Student Infraction Errors: ' + student_infraction_counter)
     console.log('Student Outcome Errors: ' + student_outcome_counter)
+    console.log('Student Program Errors: ' + student_program_counter)
   }
 
 
@@ -1145,34 +1381,36 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       console.log('Successful')
   })
 
-  // PDF Creation
-change_log_json.changes = results_pdf
-const html = fs.readFileSync("template_error.html", "utf8");
-const options = {
-  format: "Letter",
-  orientation: "portrait",
-  border: "5mm",
-  footer: {
-    height: "5mm",
-    contents: {
-        default: '<span style="float: right;"><span style="color: #444;">{{page}}</span> of <span>{{pages}} pages</span></span>'
+// PDF Creation
+  if(isSuspension){
+    change_log_json.changes = results_pdf
+    const html = fs.readFileSync("template_error.html", "utf8");
+    const options = {
+      format: "Letter",
+      orientation: "portrait",
+      border: "5mm",
+      footer: {
+        height: "5mm",
+        contents: {
+            default: '<span style="float: right;"><span style="color: #444;">{{page}}</span> of <span>{{pages}} pages</span></span>'
+        }
     }
-}
-};
-var document = {
-  html: html,
-  data: {
-    changes: change_log_json,
-  },
-  path: output_file_pdf,
-  type: "",
-};
-pdf
-.create(document, options)
-.then((res) => {
-  console.log(res);
-})
-.catch((error) => {
-  console.error(error);
-});
+    };
+    var document = {
+      html: html,
+      data: {
+        changes: change_log_json,
+      },
+      path: output_file_pdf,
+      type: "",
+    };
+    pdf
+    .create(document, options)
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
 })

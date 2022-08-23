@@ -114,16 +114,6 @@ for(var x=0;x<onsis_students.length;x++){
     }
 }
 
-// add all the non-matching onsis students
-// for(var x=0;x<onsis_students.length;x++){
-//     console.log('Non Matching Student Onsis: ' + onsis_students[x]);
-// }
-
-// // add all the non-matching powerschool students
-// for(var y=0;y<ps_students.length;y++){
-//     console.log('Non Matching Student Powerschool: ' + ps_students[y]);
-// }
-
 console.log('Number of students counted in Onsis: ' + onsis_students_count)
 console.log('Number of students counted in PowerSchool: ' + ps_students_count)
 
