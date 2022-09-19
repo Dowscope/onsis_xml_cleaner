@@ -893,7 +893,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               }
   
               // Program Errors - Multiple Incident
-              if (incidents[i].STUDENT_INCIDENT.SUSPENSION_EXPULSION_PROGRAM){
+              if (incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM){
                 if (Array.isArray(incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM)){
                   for (var frac in incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM){
                     if (Object.keys(incidents[i].STUDENT_INCIDENT[si].SUSPENSION_EXPULSION_PROGRAM[frac].DATA_ERROR_DETAILS).length > 0){
