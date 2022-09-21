@@ -13,7 +13,7 @@ if (arg.length < 5){
 // Import libraies
 const fs = require('fs')
 const prompt = require('prompt-sync')({sigint: true})
-const PDFMerger = require('pdf-merger-js')
+const PDFMerger = require('easy-pdf-merge')
 const unzip = require('unzipper')
 
 // Set variables
@@ -157,13 +157,22 @@ fs.createReadStream(zipFile)
 })
 
 // Merge the summary files together.
-async function merge () {
-    fs.readdir(submission_path + 'Summary Reports', (err, fileList) => {
-        if (err) console.log(err)
-        var merger = new PDFMerger()
-        for (var f of fileList){
-            merger.add(submission_path + '\\Summary Reports\\' + f)
+function merge () {
+    fs.readdir(submission_path + '\\Summary Reports', (err, fileList) => {
+        
+        // Get list of summary files
+        for (let index = 0; index < fileList.length; index++) {
+            fileList[index] = submission_path + 'Summary Reports\\' +  fileList[index];
         }
-        merger.save(submission_path + '\\' + school_code.toLowerCase() + '_' + submission_period.toLowerCase() + '_summary.pdf')
+
+        const outputLoc = submission_path + school_code.toLowerCase() + '_' + submission_period + '_summary.pdf'
+        
+        // Merge the files together.
+        PDFMerger(fileList, outputLoc, (err) => {
+            if (err) {
+                console.log(err)
+            }
+            console.log('File Merged: ' + outputLoc)
+        })
     })
 }
