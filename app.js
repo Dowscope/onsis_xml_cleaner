@@ -4,8 +4,8 @@
 // Get command line arguments
 const arg = process.argv.slice(2)
 
-if (arg.length > 5){
-  console.log('File Location, School BSID, School Level, period and year arguments are missing.  ie. c:\\onsis\\ mnps elem oct 2021 or /batch/ hamm sec mar 2022')
+if (arg.length < 5 || arg.length > 6){
+  console.log('File Location, School BSID, School Level, period, year and [reupload] arguments are missing.  ie. c:\\onsis\\ mnps elem oct 2021 or /batch/ hamm sec mar 2022')
   process.exit(0)
 }
 
@@ -13,6 +13,7 @@ if (arg.length > 5){
 const xmljs = require('xml-js')
 const fs = require('fs')
 const pdf = require('pdf-creator-node')
+
 
 // School and Period Information
 const school_bsid = arg[1]
@@ -22,6 +23,12 @@ var sub_date = arg[4]
 var onsis_p
 var back_date
 var submission_date
+var reupload = false;
+
+// Is this a reupload
+if (arg[5] && arg[5].toUpperCase() == 'REUPLOAD'){
+  reupload = true;
+}
 
 // Set Last day of school in June
 const last_day = '/06/28'
@@ -146,6 +153,22 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Student Changes - Student Number
   // Students with IA codes.
   const student_ia_fixes = [
+    '328301239',
+    '328301254',
+    '328301841',
+    '328302021',
+    '328302955',
+    '328303268',
+    '328303847',
+    '328311154',
+    '328319124',
+    '328321278',
+    '328321310',
+    '328328687',
+    '328329255',
+    '328331236',
+    '328331509',
+    '328333539',
   ]
 
   // Students that are missing a entry code.
@@ -197,9 +220,160 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const crs_ind_code = 'SAM'
   const crs_ind_change = '3'
 
+  // Students shoulg have a status of UPDATE not ADD
+  const student_status_fix = [
+    '328297833',
+    '328334552',
+    '328287446',
+    '328287503',
+    '328288931',
+    '328291414',
+    '328291422',
+    '328291836',
+    '328291844',
+    '328291851',
+    '328291869',
+    '328292560',
+    '328292578',
+    '328292586',
+    '328292818',
+    '328294038',
+    '328295076',
+    '328295134',
+    '328295142',
+    '328295159',
+    '328295175',
+    '328295217',
+    '328295225',
+    '328295241',
+    '328295266',
+    '328295274',
+    '328295282',
+    '328296033',
+    '328297056',
+    '328297064',
+    '328297072',
+    '328297080',
+    '328297379',
+    '328297825',
+    '328298146',
+    '328298195',
+    '328298229',
+    '328298237',
+    '328298245',
+    '328298278',
+    '328298286',
+    '328298344',
+    '328298351',
+    '328298369',
+    '328298849',
+    '328299540',
+    '328299573',
+    '328299953',
+    '328299961',
+    '328300074',
+    '328300108',
+    '328300124',
+    '328300355',
+    '328301171',
+    '328301858',
+    '328303961',
+    '328303979',
+    '328305784',
+    '328307038',
+    '328308275',
+    '328311493',
+    '328312426',
+    '328312434',
+    '328312749',
+    '328315262',
+    '328315429',
+    '328318985',
+    '328319009',
+    '328319132',
+    '328321302',
+    '328321922',
+    '328322037',
+    '328323027',
+    '328323332',
+    '328323423',
+    '328324280',
+    '328325295',
+    '328325311',
+    '328325337',
+    '328325634',
+    '328326335',
+    '328326350',
+    '328326368',
+    '328326376',
+    '328326384',
+    '328326442',
+    '328326483',
+    '328327408',
+    '328328182',
+    '328328299',
+    '328328331',
+    '328329628',
+    '328329636',
+    '328329651',
+    '328329669',
+    '328329677',
+    '328329685',
+    '328329693',
+    '328330220',
+    '328330238',
+    '328330246',
+    '328330253',
+    '328330279',
+    '328330568',
+    '328330949',
+    '328331145',
+    '328331160',
+    '328331194',
+    '328331640',
+    '328331665',
+    '328331681',
+    '328332663',
+    '328334362',
+    '328334420',
+    '328334511',
+    '328334537',
+    '328334545',
+    '328334560',
+    '328334610',
+    '328334651',
+    '328334685',
+    '328334719',
+    '328334750',
+    '328334784',
+    '328334800',
+    '328335468',
+  ]
+
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
+    '011424660',
+    '012257903',
+    '012811253',
+    '016514341',
+    '019476845',
+    '019806546',
+    '023286826',
+    '024532079',
+    '024908626',
+    '025606187',
+    '025936105',
+    '029390473',
+    '032241036',
+    '039028642',
+    '041885351',
+    '044121309',
+    '046987665',
+    '053852828',
+    '053881801',
+    '055269146',
+    '059865543',
   ]
 
   // Class assignmnets for educators should be UPDATE
@@ -526,6 +700,16 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             }
           }
           student_manual_counter += 1
+        }
+      }
+
+      // Change the student status from add to update.
+      for (var student_number in student_status_fix){
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_status_fix[student_number]){
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.ACTION._text == 'ADD'){
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ACTION._text = 'UPDATE'
+            student_manual_counter += 1
+          }
         }
       }
   
@@ -1187,6 +1371,15 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   console.log('\x1b[41m\x1b[33m%s\x1b[0m', 'Educator Missing MEN: ' + educator_missing_men)
   console.log('Educator start date not needed: ' + educator_startdate_counter)
   console.log('Educator core flag change: ' + educator_core_counter)
+
+  if(reupload){
+    console.log('This is a REUPLOAD file')
+    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_SCHOOL_EDUCATOR_ASSIGNMENT._text = 'N'
+    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_CLASS._text = 'N'
+    if (school_level == 'ELEM'){
+      jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLEAR_ASSIGNED_SUBJECT._text = 'N'
+    }
+  }
 
   // Convert the JSON to a string 
   jsonStr = JSON.stringify(jsonData)
