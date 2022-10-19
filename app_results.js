@@ -162,7 +162,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
     // Loop through the classes
     for (c in classes) {
-      if (Object.keys(classes[c].DATA_ERROR_DETAILS).length > 0){
+      if (classes[c].DATA_ERROR_DETAILS && Object.keys(classes[c].DATA_ERROR_DETAILS).length > 0){
         const rows_c = printError('N/A', 'Classes Error', classes[c].DATA_ERROR_DETAILS, null)
         for (var r of rows_c){
           results.push(r)
