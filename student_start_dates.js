@@ -1,4 +1,4 @@
-// OnSIS compare
+// OnSIS Start Dates Collector
 // Will compare the OnSIS student extract file, with PowerSchool Extract.
 
 // Get command line arguments
