@@ -54,7 +54,7 @@ function createSchoolFile(rowArray = [], bsid, sname, filepath, filename){
 for (f in files){
     if (f >= 0){
         const filePath = dir_path + '\\' + files[f]
-        const filename = files[f].split('.')
+        const filename = files[f].split('_')
 
         if (filename[0].slice(-1) == '3'){
 

@@ -70,7 +70,7 @@ for (f in files){
             var cleanRows = rows[r].replaceAll('"', '')
             var row = cleanRows.split(',')
 
-            if (row[0] == 'H1'){
+            if (row[0].trim() == 'H1'){
                 tmpSchool.push(rows[r])
                 headerRow = rows[r]
             }
