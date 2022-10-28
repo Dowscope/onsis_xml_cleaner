@@ -77,19 +77,23 @@ for (f in files){
               var cleanRows = newRow.replaceAll('"', '')
               var row = cleanRows.split(',')
 
-              if (row[0] === "H1"){
-                tmpSchool.push(newRow)
-                headerRow = newRow
+              switch (row[0].trim()) {
+                case 'H1':
+                  tmpSchool.push(newRow)
+                  headerRow = newRow
+                  break
+                case 'H2':
+                  tmpSchool.push(newRow)
+                  school_bsid = row[1]
+                  school_name = row[2]
+                  break
+                case 'DT':
+                  tmpSchool.push(newRow)
+                  break
+                default:
+                  break
               }
-              else if (row[0] == 'H2'){
-                tmpSchool.push(newRow)
-                school_bsid = row[1]
-                school_name = row[2]
-              }
-              else if (row[0] == 'DT'){
-                tmpSchool.push(newRow)
-              }
-  
+
               if (r == rows.length - 1){
                   createSchoolFile(tmpSchool, school_bsid, school_name, dir_path, filename[0])
               }
