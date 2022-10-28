@@ -34,10 +34,11 @@ const output_file = directory_path + 'results.csv'
 for (var row in onsis_rows){
     const columns = onsis_rows[row].split(',')
     if (columns[0] == '"DT"') {
-        columns[28] = columns[28].replaceAll('"','')                      // Student Numbers
-        columns[36] = columns[36].replaceAll('"', '').replaceAll(' ','')  // Start Date
+        columns[28] = columns[28].replaceAll('"','')                        // Student Numbers
+        columns[36] = columns[36].replaceAll('"', '').replaceAll(' ','')    // Start Date
+        columns[15] = columns[15].replaceAll('"','').replaceAll(' ','')     // Enrty Code
         
-        onsis_students.push([columns[28], columns[36]])
+        onsis_students.push([columns[28], columns[36], columns[15]])
     }
 }
 onsis_og_count = onsis_students.length
@@ -56,7 +57,7 @@ const results = []
 for(var x=0;x<onsis_students.length;x++){
     for(var y=0;y<ps_students.length;y++){
         if (parseInt(onsis_students[x][0])==ps_students[y]){
-            results.push([onsis_students[x][0], onsis_students[x][1]])
+            results.push([onsis_students[x][0], onsis_students[x][1], onsis_students[x][2]])
             break;
         }
     }
