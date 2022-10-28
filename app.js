@@ -177,7 +177,179 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   ]
 
   // Students need status change to UPDATE and correct start date
+  const student_sf_date = ['M','D','Y']
   const student_status_fixes = [
+    ['328331509',	'9/2/2021', 'IA'],
+    ['328334750',	'9/10/2020', 'IA'],
+    ['328322227',	'9/9/2021', 'IA'],
+    ['328292578',	'9/5/2018', 'IA'],
+    ['328329677',	'9/4/2019', 'IA'],
+    ['328333539',	'9/2/2021', 'IA'],
+    ['328326483',	'9/6/2018', 'IA'],
+    ['328304548',	'9/2/2021', 'IA'],
+    ['360547038',	'9/2/2021', 'IA'],
+    ['328303870',	'9/2/2021', 'IA'],
+    ['360547007',	'9/2/2021', 'IA'],
+    ['328295159',	'9/4/2019', 'IA'],
+    ['328336144',	'9/2/2021', 'IA'],
+    ['328307038',	'9/4/2019', 'IA'],
+    ['328295217',	'9/5/2019', 'IA'],
+    ['328325337',	'9/10/2019', 'IA'],
+    ['328298237',	'9/3/2020', 'IA'],
+    ['328326442',	'9/5/2018', 'IA'],
+    ['328308275',	'9/4/2019', 'IA'],
+    ['328315262',	'9/17/2018', 'IA'],
+    ['328329685',	'9/4/2019', 'IA'],
+    ['328325634',	'10/3/2017', 'IA'],
+    ['328336367',	'9/2/2021', 'IA'],
+    ['328303805',	'9/2/2021', 'IA'],
+    ['328301825',	'9/2/2021', 'IA'],
+    ['328334719',	'9/21/2020', 'IA'],
+    ['328295225',	'9/5/2019', 'IA'],
+    ['328287503',	'9/6/2017', 'IA'],
+    ['328328299',	'9/5/2018', 'IA'],
+    ['328328687',	'9/2/2021', 'IA'],
+    ['328291414',	'9/6/2018', 'IA'],
+    ['328329669',	'9/4/2019', 'IA'],
+    ['328336359',	'9/2/2021', 'IA'],
+    ['328291844',	'9/5/2018', 'IA'],
+    ['328311493',	'9/5/2018', 'IA'],
+    ['10019',	'9/2/2021', 'IA'],
+    ['328298849',	'9/2/2020', 'IA'],
+    ['328319132',	'9/2/2020', 'IA'],
+    ['328311154',	'9/2/2021', 'IA'],
+    ['328318985',	'9/2/2020', 'IA'],
+    ['360547022',	'9/2/2021', 'IA'],
+    ['328319124',	'9/2/2021', 'IA'],
+    ['328334420',	'9/3/2020', 'IA'],
+    ['328330220',	'9/4/2019', 'IA'],
+    ['328295134',	'9/4/2019', 'IA'],
+    ['328312780',	'9/2/2021', 'IA'],
+    ['328336458',	'9/2/2021', 'IA'],
+    ['328292586',	'9/6/2018', 'IA'],
+    ['328298146',	'9/2/2020', 'IA'],
+    ['328297080',	'9/9/2019', 'IA'],
+    ['328330949',	'9/4/2019', 'IA'],
+    ['328336326',	'9/2/2021', 'IA'],
+    ['328287446',	'10/30/2020', 'IA'],
+    ['328326368',	'9/5/2018', 'IA'],
+    ['328303268',	'9/2/2021', 'IA'],
+    ['328334784',	'9/28/2020', 'IA'],
+    ['328295274',	'9/4/2019', 'IA'],
+    ['328334552',	'9/3/2020', 'IA'],
+    ['328321278',	'9/2/2021', 'IA'],
+    ['328298286',	'9/2/2020', 'IA'],
+    ['328331640',	'9/5/2019', 'IA'],
+    ['328329651',	'9/4/2019', 'IA'],
+    ['328299540',	'9/3/2020', 'IA'],
+    ['328319009',	'9/4/2019', 'IA'],
+    ['328335468',	'1/4/2021', 'IA'],
+    ['360547054',	'9/7/2021', 'IA'],
+    ['328336409',	'9/2/2021', 'IA'],
+    ['360547059',	'9/2/2021', 'IA'],
+    ['328295175',	'9/4/2019', 'IA'],
+    ['328303961',	'9/4/2019', 'IA'],
+    ['328302955',	'9/2/2021', 'IA'],
+    ['328336334',	'9/2/2021', 'IA'],
+    ['328312426',	'9/2/2020', 'IA'],
+    ['328301783',	'9/2/2021', 'IA'],
+    ['328322037',	'9/14/2020', 'IA'],
+    ['328297064',	'9/5/2018', 'IA'],
+    ['328327408',	'9/5/2018', 'IA'],
+    ['328321310',	'9/2/2021', 'IA'],
+    ['328291836',	'9/5/2018', 'IA'],
+    ['328329693',	'9/4/2019', 'IA'],
+    ['328296033',	'9/4/2019', 'IA'],
+    ['328299961',	'9/5/2018', 'IA'],
+    ['328326335',	'9/5/2018', 'IA'],
+    ['328326350',	'9/5/2018', 'IA'],
+    ['328291869',	'9/5/2018', 'IA'],
+    ['328301254',	'9/2/2021', 'IA'],
+    ['328326384',	'9/5/2018', 'IA'],
+    ['360547080',	'9/17/2021', 'IA'],
+    ['328298229',	'9/2/2020', 'IA'],
+    ['328328182',	'9/10/2019', 'IA'],
+    ['328328836',	'9/2/2021', 'IA'],
+    ['328298351',	'9/2/2020', 'IA'],
+    ['328330238',	'9/4/2019', 'IA'],
+    ['328330253',	'9/4/2019', 'IA'],
+    ['328295266',	'9/4/2019', 'IA'],
+    ['328325311',	'9/4/2019', 'IA'],
+    ['328298278',	'9/2/2020', 'IA'],
+    ['328336193',	'9/2/2021', 'IA'],
+    ['360547050',	'9/7/2021', 'IA'],
+    ['328303847',	'9/2/2021', 'IA'],
+    ['328334560',	'9/3/2020', 'IA'],
+    ['328294038',	'9/6/2017', 'IA'],
+    ['328295076',	'9/4/2019', 'IA'],
+    ['328301171',	'9/2/2020', 'IA'],
+    ['328331160',	'11/23/2020', 'IA'],
+    ['328297072',	'9/4/2019', 'IA'],
+    ['328334545',	'9/3/2020', 'IA'],
+    ['328301841',	'9/2/2021', 'IA'],
+    ['328300074',	'9/3/2020', 'IA'],
+    ['328297056',	'9/5/2018', 'IA'],
+    ['328334511',	'9/3/2020', 'IA'],
+    ['328305784',	'9/5/2018', 'IA'],
+    ['328299953',	'9/2/2020', 'IA'],
+    ['328334651',	'9/3/2020', 'IA'],
+    ['328321302',	'9/5/2018', 'IA'],
+    ['328323332',	'9/6/2017', 'IA'],
+    ['328327952',	'9/2/2021', 'IA'],
+    ['328303979',	'9/3/2020', 'IA'],
+    ['328295282',	'9/4/2019', 'IA'],
+    ['328288931',	'9/6/2019', 'IA'],
+    ['328326400',	'9/2/2021', 'IA'],
+    ['328292818',	'2/18/2021', 'IA'],
+    ['328337217',	'9/2/2021', 'IA'],
+    ['360547039',	'9/2/2021', 'IA'],
+    ['328329636',	'9/4/2019', 'IA'],
+    ['328298369',	'9/3/2020', 'IA'],
+    ['328334537',	'9/3/2020', 'IA'],
+    ['328297833',	'9/4/2019', 'IA'],
+    ['328297379',	'9/5/2018', 'IA'],
+    ['328298245',	'9/2/2020', 'IA'],
+    ['328298195',	'9/2/2020', 'IA'],
+    ['328292560',	'9/5/2018', 'IA'],
+    ['328326376',	'9/5/2018', 'IA'],
+    ['10028',	'9/2/2021', 'IA'],
+    ['328336342',	'9/2/2021', 'IA'],
+    ['360547057',	'9/3/2021', 'IA'],
+    ['328331681',	'9/10/2019', 'IA'],
+    ['328330279',	'9/4/2019', 'IA'],
+    ['328301239',	'9/2/2021', 'IA'],
+    ['328334610',	'9/3/2020', 'IA'],
+    ['328336185',	'9/2/2021', 'IA'],
+    ['360547056',	'9/2/2021', 'IA'],
+    ['328330246',	'9/4/2019', 'IA'],
+    ['328336177',	'9/2/2021', 'IA'],
+    ['360547071',	'9/13/2021', 'IA'],
+    ['328328331',	'9/5/2018', 'IA'],
+    ['328321922',	'9/5/2018', 'IA'],
+    ['328291851',	'9/5/2018', 'IA'],
+    ['328331236',	'9/2/2021', 'IA'],
+    ['328301858',	'9/14/2020', 'IA'],
+    ['328297825',	'9/5/2018', 'IA'],
+    ['328298344',	'9/2/2020', 'IA'],
+    ['328301809',	'9/2/2021', 'IA'],
+    ['328324280',	'9/6/2017', 'IA'],
+    ['328325295',	'9/4/2019', 'IA'],
+    ['328295142',	'9/4/2019', 'IA'],
+    ['328300108',	'9/5/2018', 'IA'],
+    ['360547073',	'9/7/2021', 'IA'],
+    ['328299573',	'9/2/2020', 'IA'],
+    ['328300355',	'9/2/2020', 'IA'],
+    ['328295241',	'9/4/2019', 'IA'],
+    ['328337209',	'9/2/2021', 'IA'],
+    ['328329255',	'9/2/2021', 'IA'],
+    ['328312434',	'9/5/2018', 'IA'],
+    ['328291422',	'9/5/2018', 'IA'],
+    ['328302021',	'9/2/2021', 'IA'],
+    ['328307269',	'9/21/2021', 'IA'],
+    ['328300124',	'9/17/2018', 'IA'],
+    ['328330568',	'9/4/2019', 'IA'],
+    328296942
+    328323431
   ]
 
   // Students that have a wrong postal code.
@@ -213,6 +385,42 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Change the student special ed status from UPDATE to ADD.
   const manual_speced_status_fix = [
+    '328291414',
+    '328292578',
+    '328295225',
+    '328300124',
+    '328300355',
+    '328315262',
+    '328318985',
+    '328319009',
+    '328319124',
+    '328324280',
+    '328325311',
+    '328326483',
+    '328328182',
+    '328329669',
+    '328329693',
+    '328330220',
+    '328330238',
+    '328331640',
+    '328331681',
+    '328334545',
+    '328334750',
+    '328335468',
+    '328336193',
+    '328336326',
+    '328336326',
+    '328336359',
+    '328336409',
+    '10028',
+    '360547038',
+    '360547073',
+  ]
+
+  // SHSM should be an ADD status
+  const manual_shsm_fix = [
+    '328295076',
+    '328297080',
   ]
 
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
@@ -390,6 +598,54 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
       class_codes.push({'code':classes[c].CLASS_CODE._text, 'index':c, 'segment':hasSegment})
     }
+
+    // Automatic -----------------------------
+    if (sub_month == 'MAR'){
+      // Change the status from ADD to UPDATE
+      if (classes[c].ACTION._text == 'ADD' && classes[c].CLASS_END_DATE._text == '2021/11/09'){
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].ACTION._text = 'UPDATE'
+        jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].CLASS_START_DATE._text = '2021/08/30'
+        
+        if (classes[c].SEGMENT){
+          if (Array.isArray(classes[c].SEGMENT)){
+            for (var o in classes[c].SEGMENT){
+              if (classes[c].SEGMENT[o].ACTION._text == 'ADD'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].ACTION._text = 'UPDATE'
+              }
+            }
+          }
+          else {
+            if (classes[c].SEGMENT.ACTION._text == 'ADD'){
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT.ACTION._text = 'UPDATE'
+            }
+          }
+        }
+      }
+    }
+
+    // Change ministry courses to local courses
+    if (classes[c].SEGMENT){
+      if (Array.isArray(classes[c].SEGMENT)){
+        for (var o in classes[c].SEGMENT){
+          if (classes[c].SEGMENT[o].MINISTRY_DFND_CRS && classes[c].SEGMENT[o].MINISTRY_DFND_CRS._text){
+            const crsCode = classes[c].SEGMENT[o].MINISTRY_DFND_CRS._text
+            if ( crsCode.slice(-1) == 'L'){
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].MINISTRY_DFND_CRS._text = ''
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].LOCAL_DEV_CRS._text = crsCode
+            }
+          }
+        }
+      }
+      else {
+        if (classes[c].SEGMENT.MINISTRY_DFND_CRS && classes[c].SEGMENT.MINISTRY_DFND_CRS._text){
+          const crsCode = classes[c].SEGMENT.MINISTRY_DFND_CRS._text
+          if ( crsCode.slice(-1) == 'L'){
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT.MINISTRY_DFND_CRS._text = ''
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT.LOCAL_DEV_CRS._text = crsCode
+          }
+        }
+      }
+    }
   }
   
   // Loop through the students
@@ -444,10 +700,33 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       }
       
       // Status Changes
-      for (student_number in student_status_fixes){
+      for (var student_number in student_status_fixes){
         if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_status_fixes[student_number][0]){
+          const oldDate = student_status_fixes[student_number][1].split('/')
+          var y = ''
+          var m = ''
+          var d = ''
+          for (var i in student_sf_date){
+            if (student_sf_date[i].toUpperCase() == 'Y'){
+              y = oldDate[i]
+            }
+            else if (student_sf_date[i].toUpperCase() == 'M'){
+              m = oldDate[i]
+              if (m.length < 2) {
+                m = '0' + m
+              }
+            }
+            else if (student_sf_date[i].toUpperCase() == 'D'){
+              d = oldDate[i]
+              if (d.length < 2) {
+                d = '0' + d
+              }
+            }
+          }
+          const newDate = y + '/' + m + '/' + d
           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ACTION._text = 'UPDATE'
-          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_START_DATE._text = student_status_fixes[student_number][1]
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ENROLMENT_START_DATE._text = newDate
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_MOBILITY_TYPE._text = student_status_fixes[student_number][2]
           student_manual_counter += 1
         }
       }
@@ -616,11 +895,37 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                   jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sse].ACTION._text = 'ADD'
                   student_manual_counter += 1
                 }
+                else if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sse].ACTION._text == 'ADD'){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[sse].ACTION._text = 'UPDATE'
+                  student_manual_counter += 1
+                }
               }
             }
             else {
               if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text == 'UPDATE'){
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text = 'ADD'
+                student_manual_counter += 1
+              }
+            }
+          }
+        }
+      }
+
+      // Change the student SHSM status from UPDATE to ADD.
+      for (var student_number in manual_shsm_fix){
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == manual_shsm_fix[student_number]){
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM){
+            if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM)){
+              for (var sse in students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[sse].ACTION._text == 'UPDATE'){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM[sse].ACTION._text = 'ADD'
+                  student_manual_counter += 1
+                }
+              }
+            }
+            else {
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.ACTION._text == 'UPDATE'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SHSM_PROGRAM.ACTION._text = 'ADD'
                 student_manual_counter += 1
               }
             }
@@ -786,6 +1091,18 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.ACTION._text = 'ADD'
               }
             }
+
+            // Correct ministry courses with local courses.
+            if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.MINISTRY_DFND_CRS && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.MINISTRY_DFND_CRS._text){
+              const crsCode = students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.MINISTRY_DFND_CRS._text
+              if ( crsCode.slice(-1) == 'L'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.MINISTRY_DFND_CRS._text = ''
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.LOCAL_DEV_CRS._text = crsCode
+              }
+              if (crsCode.length > 5){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.MINISTRY_DFND_CRS._text = crsCode.slice(0, 5)
+              }
+            }
           }
           else {
             for ( cls in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT ){
@@ -849,6 +1166,18 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               if (sub_month == 'OCT'){
                 if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].ACTION._text == 'UPDATE') {
                   jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].ACTION._text = 'ADD'
+                }
+              }
+
+              // Correct ministry courses with local courses.
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].MINISTRY_DFND_CRS && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].MINISTRY_DFND_CRS._text){
+                const crsCode = students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].MINISTRY_DFND_CRS._text
+                if ( crsCode.slice(-1) == 'L'){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].MINISTRY_DFND_CRS._text = ''
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].LOCAL_DEV_CRS._text = crsCode
+                }
+                if (crsCode.length > 5){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].MINISTRY_DFND_CRS._text = crsCode.slice(0, 5)
                 }
               }
             }
