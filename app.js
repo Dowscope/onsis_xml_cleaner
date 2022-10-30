@@ -213,40 +213,9 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Students shoulg have a status of ADD not UPDATE
   const student_status_fix = [
   ]
-
+  
   // Change the student special ed status from UPDATE to ADD. or ADD to UPDATE 
   const manual_speced_status_fix = [
-    '328305602',
-    '328305768',
-    '328306600',
-    '328306907',
-    '328307129',
-    '328307277',
-    '328307285',
-    '328311105',
-    '328311824',
-    '328314588',
-    '328314638',
-    '328316435',
-    '328318233',
-    '328318316',
-    '328318365',
-    '328318381',
-    '328318464',
-    '328321096',
-    '328324546',
-    '328324579',
-    '328326665',
-    '328326681',
-    '328327663',
-    '328327853',
-    '328329750',
-    '328331004',
-    '328333687',
-    '328335344',
-    '328335898',
-    '328335906',
-    '10018'
   ]
 
   // SHSM should be an ADD status
@@ -268,7 +237,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
-    '38911962'
   ]
 
   // Class assignmnets for educators should be UPDATE
@@ -753,6 +721,10 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             else {
               if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text == 'UPDATE'){
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text = 'ADD'
+                student_manual_counter += 1
+              }
+              else if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text == 'ADD'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text = 'UPDATE'
                 student_manual_counter += 1
               }
             }
