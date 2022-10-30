@@ -155,6 +155,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const class_segment_fix = [
   ]
 
+  
+
   // Manual Student Changes - Student Number --------------------------
   // Students with IA codes.
   const student_ia_fixes = [
@@ -179,177 +181,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   // Students need status change to UPDATE and correct start date
   const student_sf_date = ['M','D','Y']
   const student_status_fixes = [
-    ['328331509',	'9/2/2021', 'IA'],
-    ['328334750',	'9/10/2020', 'IA'],
-    ['328322227',	'9/9/2021', 'IA'],
-    ['328292578',	'9/5/2018', 'IA'],
-    ['328329677',	'9/4/2019', 'IA'],
-    ['328333539',	'9/2/2021', 'IA'],
-    ['328326483',	'9/6/2018', 'IA'],
-    ['328304548',	'9/2/2021', 'IA'],
-    ['360547038',	'9/2/2021', 'IA'],
-    ['328303870',	'9/2/2021', 'IA'],
-    ['360547007',	'9/2/2021', 'IA'],
-    ['328295159',	'9/4/2019', 'IA'],
-    ['328336144',	'9/2/2021', 'IA'],
-    ['328307038',	'9/4/2019', 'IA'],
-    ['328295217',	'9/5/2019', 'IA'],
-    ['328325337',	'9/10/2019', 'IA'],
-    ['328298237',	'9/3/2020', 'IA'],
-    ['328326442',	'9/5/2018', 'IA'],
-    ['328308275',	'9/4/2019', 'IA'],
-    ['328315262',	'9/17/2018', 'IA'],
-    ['328329685',	'9/4/2019', 'IA'],
-    ['328325634',	'10/3/2017', 'IA'],
-    ['328336367',	'9/2/2021', 'IA'],
-    ['328303805',	'9/2/2021', 'IA'],
-    ['328301825',	'9/2/2021', 'IA'],
-    ['328334719',	'9/21/2020', 'IA'],
-    ['328295225',	'9/5/2019', 'IA'],
-    ['328287503',	'9/6/2017', 'IA'],
-    ['328328299',	'9/5/2018', 'IA'],
-    ['328328687',	'9/2/2021', 'IA'],
-    ['328291414',	'9/6/2018', 'IA'],
-    ['328329669',	'9/4/2019', 'IA'],
-    ['328336359',	'9/2/2021', 'IA'],
-    ['328291844',	'9/5/2018', 'IA'],
-    ['328311493',	'9/5/2018', 'IA'],
-    ['10019',	'9/2/2021', 'IA'],
-    ['328298849',	'9/2/2020', 'IA'],
-    ['328319132',	'9/2/2020', 'IA'],
-    ['328311154',	'9/2/2021', 'IA'],
-    ['328318985',	'9/2/2020', 'IA'],
-    ['360547022',	'9/2/2021', 'IA'],
-    ['328319124',	'9/2/2021', 'IA'],
-    ['328334420',	'9/3/2020', 'IA'],
-    ['328330220',	'9/4/2019', 'IA'],
-    ['328295134',	'9/4/2019', 'IA'],
-    ['328312780',	'9/2/2021', 'IA'],
-    ['328336458',	'9/2/2021', 'IA'],
-    ['328292586',	'9/6/2018', 'IA'],
-    ['328298146',	'9/2/2020', 'IA'],
-    ['328297080',	'9/9/2019', 'IA'],
-    ['328330949',	'9/4/2019', 'IA'],
-    ['328336326',	'9/2/2021', 'IA'],
-    ['328287446',	'10/30/2020', 'IA'],
-    ['328326368',	'9/5/2018', 'IA'],
-    ['328303268',	'9/2/2021', 'IA'],
-    ['328334784',	'9/28/2020', 'IA'],
-    ['328295274',	'9/4/2019', 'IA'],
-    ['328334552',	'9/3/2020', 'IA'],
-    ['328321278',	'9/2/2021', 'IA'],
-    ['328298286',	'9/2/2020', 'IA'],
-    ['328331640',	'9/5/2019', 'IA'],
-    ['328329651',	'9/4/2019', 'IA'],
-    ['328299540',	'9/3/2020', 'IA'],
-    ['328319009',	'9/4/2019', 'IA'],
-    ['328335468',	'1/4/2021', 'IA'],
-    ['360547054',	'9/7/2021', 'IA'],
-    ['328336409',	'9/2/2021', 'IA'],
-    ['360547059',	'9/2/2021', 'IA'],
-    ['328295175',	'9/4/2019', 'IA'],
-    ['328303961',	'9/4/2019', 'IA'],
-    ['328302955',	'9/2/2021', 'IA'],
-    ['328336334',	'9/2/2021', 'IA'],
-    ['328312426',	'9/2/2020', 'IA'],
-    ['328301783',	'9/2/2021', 'IA'],
-    ['328322037',	'9/14/2020', 'IA'],
-    ['328297064',	'9/5/2018', 'IA'],
-    ['328327408',	'9/5/2018', 'IA'],
-    ['328321310',	'9/2/2021', 'IA'],
-    ['328291836',	'9/5/2018', 'IA'],
-    ['328329693',	'9/4/2019', 'IA'],
-    ['328296033',	'9/4/2019', 'IA'],
-    ['328299961',	'9/5/2018', 'IA'],
-    ['328326335',	'9/5/2018', 'IA'],
-    ['328326350',	'9/5/2018', 'IA'],
-    ['328291869',	'9/5/2018', 'IA'],
-    ['328301254',	'9/2/2021', 'IA'],
-    ['328326384',	'9/5/2018', 'IA'],
-    ['360547080',	'9/17/2021', 'IA'],
-    ['328298229',	'9/2/2020', 'IA'],
-    ['328328182',	'9/10/2019', 'IA'],
-    ['328328836',	'9/2/2021', 'IA'],
-    ['328298351',	'9/2/2020', 'IA'],
-    ['328330238',	'9/4/2019', 'IA'],
-    ['328330253',	'9/4/2019', 'IA'],
-    ['328295266',	'9/4/2019', 'IA'],
-    ['328325311',	'9/4/2019', 'IA'],
-    ['328298278',	'9/2/2020', 'IA'],
-    ['328336193',	'9/2/2021', 'IA'],
-    ['360547050',	'9/7/2021', 'IA'],
-    ['328303847',	'9/2/2021', 'IA'],
-    ['328334560',	'9/3/2020', 'IA'],
-    ['328294038',	'9/6/2017', 'IA'],
-    ['328295076',	'9/4/2019', 'IA'],
-    ['328301171',	'9/2/2020', 'IA'],
-    ['328331160',	'11/23/2020', 'IA'],
-    ['328297072',	'9/4/2019', 'IA'],
-    ['328334545',	'9/3/2020', 'IA'],
-    ['328301841',	'9/2/2021', 'IA'],
-    ['328300074',	'9/3/2020', 'IA'],
-    ['328297056',	'9/5/2018', 'IA'],
-    ['328334511',	'9/3/2020', 'IA'],
-    ['328305784',	'9/5/2018', 'IA'],
-    ['328299953',	'9/2/2020', 'IA'],
-    ['328334651',	'9/3/2020', 'IA'],
-    ['328321302',	'9/5/2018', 'IA'],
-    ['328323332',	'9/6/2017', 'IA'],
-    ['328327952',	'9/2/2021', 'IA'],
-    ['328303979',	'9/3/2020', 'IA'],
-    ['328295282',	'9/4/2019', 'IA'],
-    ['328288931',	'9/6/2019', 'IA'],
-    ['328326400',	'9/2/2021', 'IA'],
-    ['328292818',	'2/18/2021', 'IA'],
-    ['328337217',	'9/2/2021', 'IA'],
-    ['360547039',	'9/2/2021', 'IA'],
-    ['328329636',	'9/4/2019', 'IA'],
-    ['328298369',	'9/3/2020', 'IA'],
-    ['328334537',	'9/3/2020', 'IA'],
-    ['328297833',	'9/4/2019', 'IA'],
-    ['328297379',	'9/5/2018', 'IA'],
-    ['328298245',	'9/2/2020', 'IA'],
-    ['328298195',	'9/2/2020', 'IA'],
-    ['328292560',	'9/5/2018', 'IA'],
-    ['328326376',	'9/5/2018', 'IA'],
-    ['10028',	'9/2/2021', 'IA'],
-    ['328336342',	'9/2/2021', 'IA'],
-    ['360547057',	'9/3/2021', 'IA'],
-    ['328331681',	'9/10/2019', 'IA'],
-    ['328330279',	'9/4/2019', 'IA'],
-    ['328301239',	'9/2/2021', 'IA'],
-    ['328334610',	'9/3/2020', 'IA'],
-    ['328336185',	'9/2/2021', 'IA'],
-    ['360547056',	'9/2/2021', 'IA'],
-    ['328330246',	'9/4/2019', 'IA'],
-    ['328336177',	'9/2/2021', 'IA'],
-    ['360547071',	'9/13/2021', 'IA'],
-    ['328328331',	'9/5/2018', 'IA'],
-    ['328321922',	'9/5/2018', 'IA'],
-    ['328291851',	'9/5/2018', 'IA'],
-    ['328331236',	'9/2/2021', 'IA'],
-    ['328301858',	'9/14/2020', 'IA'],
-    ['328297825',	'9/5/2018', 'IA'],
-    ['328298344',	'9/2/2020', 'IA'],
-    ['328301809',	'9/2/2021', 'IA'],
-    ['328324280',	'9/6/2017', 'IA'],
-    ['328325295',	'9/4/2019', 'IA'],
-    ['328295142',	'9/4/2019', 'IA'],
-    ['328300108',	'9/5/2018', 'IA'],
-    ['360547073',	'9/7/2021', 'IA'],
-    ['328299573',	'9/2/2020', 'IA'],
-    ['328300355',	'9/2/2020', 'IA'],
-    ['328295241',	'9/4/2019', 'IA'],
-    ['328337209',	'9/2/2021', 'IA'],
-    ['328329255',	'9/2/2021', 'IA'],
-    ['328312434',	'9/5/2018', 'IA'],
-    ['328291422',	'9/5/2018', 'IA'],
-    ['328302021',	'9/2/2021', 'IA'],
-    ['328307269',	'9/21/2021', 'IA'],
-    ['328300124',	'9/17/2018', 'IA'],
-    ['328330568',	'9/4/2019', 'IA'],
-    328296942
-    328323431
   ]
 
   // Students that have a wrong postal code.
@@ -383,49 +214,61 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const student_status_fix = [
   ]
 
-  // Change the student special ed status from UPDATE to ADD.
+  // Change the student special ed status from UPDATE to ADD. or ADD to UPDATE 
   const manual_speced_status_fix = [
-    '328291414',
-    '328292578',
-    '328295225',
-    '328300124',
-    '328300355',
-    '328315262',
-    '328318985',
-    '328319009',
-    '328319124',
-    '328324280',
-    '328325311',
-    '328326483',
-    '328328182',
-    '328329669',
-    '328329693',
-    '328330220',
-    '328330238',
-    '328331640',
-    '328331681',
-    '328334545',
-    '328334750',
-    '328335468',
-    '328336193',
-    '328336326',
-    '328336326',
-    '328336359',
-    '328336409',
-    '10028',
-    '360547038',
-    '360547073',
+    '328305602',
+    '328305768',
+    '328306600',
+    '328306907',
+    '328307129',
+    '328307277',
+    '328307285',
+    '328311105',
+    '328311824',
+    '328314588',
+    '328314638',
+    '328316435',
+    '328318233',
+    '328318316',
+    '328318365',
+    '328318381',
+    '328318464',
+    '328321096',
+    '328324546',
+    '328324579',
+    '328326665',
+    '328326681',
+    '328327663',
+    '328327853',
+    '328329750',
+    '328331004',
+    '328333687',
+    '328335344',
+    '328335898',
+    '328335906',
+    '10018'
   ]
 
   // SHSM should be an ADD status
   const manual_shsm_fix = [
-    '328295076',
-    '328297080',
+  ]
+
+  // Students need to end class
+  const manual_class_end_fix = [
+  ]
+
+  // Total Classes need a number
+  const manual_total_classes_fix = [
+  ]
+
+  // Student class should be update and not add
+  const manual_class_status_fix = [
   ]
 
   // Manual Educator Changes - Make sure to add the preceeding zero if the MEN doesn't have it.
   // Change eductor status to UPDATE if it is ADD.
   const manual_status_fix = [
+    '38911962'
   ]
 
   // Class assignmnets for educators should be UPDATE
@@ -633,6 +476,9 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].MINISTRY_DFND_CRS._text = ''
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].LOCAL_DEV_CRS._text = crsCode
             }
+            if (crsCode.length > 5){
+              jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].MINISTRY_DFND_CRS._text = crsCode.slice(0, 5)
+            }
           }
         }
       }
@@ -642,6 +488,9 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           if ( crsCode.slice(-1) == 'L'){
             jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT.MINISTRY_DFND_CRS._text = ''
             jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT.LOCAL_DEV_CRS._text = crsCode
+          }
+          if (crsCode.length > 5){
+            jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT.MINISTRY_DFND_CRS._text = crsCode.slice(0, 5)
           }
         }
       }
@@ -932,6 +781,90 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           }
         }
       }
+
+      // Class needs to be end dated
+      for (var student_number in manual_class_end_fix){
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == manual_class_end_fix[student_number[0]]){
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+            if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+              for (var cls in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].CLASS_CODE._text == student_number[1]){
+                  wtdate = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE._text
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_TYPE._text = 'D'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].WITHDRAWAL_DATE._text = wtdate
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].EARNED_CREDIT_VALUE._text = '0.00'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].FINAL_MARK._text = '0'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_COMPLETE_FLAG._text = 'F'
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_INCOMPLETE_FLAG._text = 'T'
+                }
+              }
+            }
+            else {
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE._text == student_number[1]){
+                wtdate = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE._text
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE._text = 'D'
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_DATE._text = wtdate
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE._text = '0.00'
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK._text = '0'
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text = 'F'
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_INCOMPLETE_FLAG._text = 'T'
+              }
+            }
+          }
+        }
+      }
+
+      // Total Classes need a number
+      for (var student_number in manual_total_classes_fix){
+        if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == manual_total_classes_fix[student_number]){
+          if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+            if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+              for (var cls in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE){
+                  if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].COURSE_END_DATE).length > 0){
+                    jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].TOTAL_CLASSES._text = '92'
+                  }
+                }
+              }
+            }
+            else {
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE){
+                if (Object.keys(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE).length > 0){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.TOTAL_CLASSES._text = '92'
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Student class should be update and not add
+      // for (var student_number in manual_class_status_fix){
+      //   if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == manual_class_status_fix[student_number[0]]){
+      //     if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+      //       if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+      //         for (var cls in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+      //           if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].CLASS_CODE._text == student_number[1]){
+      //             if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].ACTION._text == 'ADD'){
+      //               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[cls].ACTION._text = 'UPDATE'
+      //             }
+      //           }
+      //         }
+      //       }
+      //       else {
+      //         if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE._text == student_number[1]){
+      //           wtdate = jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_END_DATE._text
+      //           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_TYPE._text = 'D'
+      //           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.WITHDRAWAL_DATE._text = wtdate
+      //           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.EARNED_CREDIT_VALUE._text = '0.00'
+      //           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.FINAL_MARK._text = '0'
+      //           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_COMPLETE_FLAG._text = 'F'
+      //           jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.COURSE_INCOMPLETE_FLAG._text = 'T'
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
   
       // ----- Automatic Changes -----
       

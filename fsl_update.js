@@ -46,7 +46,8 @@ for (var s in students){
   for (var fsl_s of fsl_students){
     if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == fsl_s[0] ||
       students[s].OEN._text == fsl_s[0]) {
-      var fsl_type = '027'
+      var fsl_type = '021'
+      // var fsl_type = '027' // This is for highschool
       if (fsl_s[3] == '2032'){
         fsl_type = '001'
       }
@@ -58,7 +59,7 @@ for (var s in students){
           '_text': fsl_type,
         },
         'MINUTES_PER_DAY_OF_INSTRUCTION': {
-          '_text': '0',
+          '_text': '040.00',
         },
       }
       jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM = record
