@@ -172,9 +172,10 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
+    '328310867'
   ]
 
-  // Students should be ADD not UPDATE
+  // Students should be UPDATE
   const student_status_add = [
   ]
 
@@ -185,6 +186,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong postal code.
   const student_postal_fixes = [
+    '360547103'
   ]
 
   // Students class start date removed when ACTION is update
@@ -478,20 +480,20 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       // Status Change to add
       for (student_number in student_status_add){
         if (students[s].STUDENT_SCHOOL_ENROLMENT.SCHOOL_STUDENT_NUMBER._text == student_status_add[student_number]){
-          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ACTION._text = 'ADD'
+          jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.ACTION._text = 'UPDATE'
 
           // Change spec ed if applicable
           if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
             if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION)){
               for (speced in students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION){
-                if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[speced].ACTION._text == 'UPDATE'){
-                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[speced].ACTION._text = 'ADD'
+                if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[speced].ACTION._text == 'ADD'){
+                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION[speced].ACTION._text = 'UPDATE'
                 }
               }
             }
             else {
-              if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text == 'UPDATE'){
-                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text = 'ADD'
+              if (students[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text == 'ADD'){
+                jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SPECIAL_EDUCATION.ACTION._text = 'UPDATE'
               }
             }
           }
