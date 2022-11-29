@@ -1381,36 +1381,38 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       console.log('Successful')
   })
 
-// PDF Creation
-  if(isSuspension){
-    change_log_json.changes = results_pdf
-    const html = fs.readFileSync("template_error.html", "utf8");
-    const options = {
-      format: "Letter",
-      orientation: "portrait",
-      border: "5mm",
-      footer: {
-        height: "5mm",
-        contents: {
-            default: '<span style="float: right;"><span style="color: #444;">{{page}}</span> of <span>{{pages}} pages</span></span>'
-        }
-    }
-    };
-    var document = {
-      html: html,
-      data: {
-        changes: change_log_json,
-      },
-      path: output_file_pdf,
-      type: "",
-    };
-    pdf
-    .create(document, options)
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  // PDF Creation
+  var html = fs.readFileSync("template_error.html", "utf8");
+  if (isSuspension){
+    html = fs.readFileSync("template_error_sus.html", "utf8");
   }
+
+  change_log_json.changes = results_pdf
+  const options = {
+    format: "Letter",
+    orientation: "portrait",
+    border: "5mm",
+    footer: {
+      height: "5mm",
+      contents: {
+          default: '<span style="float: right;"><span style="color: #444;">{{page}}</span> of <span>{{pages}} pages</span></span>'
+      }
+  }
+  };
+  var document = {
+    html: html,
+    data: {
+      changes: change_log_json,
+    },
+    path: output_file_pdf,
+    type: "",
+  };
+  pdf
+  .create(document, options)
+  .then((res) => {
+    console.log(res);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 })

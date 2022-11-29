@@ -13,21 +13,23 @@
 		</style>
   </head>
   <body>
-		<h1 style="text-align: center; margin-bottom: 2px;">OnSIS Submission Errors</h1>
+		<h1 style="text-align: center; margin-bottom: 2px;">OnSIS Incident Errors</h1>
 		<h5 style="text-align: center; margin: 0;">School: {{changes.bsid}} Submission Year: {{changes.submissionDate}} Submission Month: {{changes.subMonth}}</h5>
-		<h2>Please fix the following submission errors in PowerSchool or OEN Site and Contact Tim Dowling with what you changed.</h2>
-		<table style="border: 1px solid black; width: 100%;">
+		<h2>Please fix the following incident errors in PowerSchool</h2>
+		<table style="border: 1px solid black;">
 			<thead>
-				<td style="font-weight: bold;text-align: center;" width="150px">Student#/MEN</td>
+				<td style="font-weight: bold;text-align: center;" width="150px">Incident ID</td>
+				<td style="font-weight: bold;text-align: center;" width="150px">Section</td>
 				<td style="font-weight: bold;text-align: center;" width="150px">Error</td>
 				<td style="font-weight: bold;text-align: center;">Value</td>
 				<td style="font-weight: bold;text-align: center;">Description of Error</td>
 			</thead>
 			{{#each changes.changes}}
 			<tr style="border: 1px solid black;">
-				<td style="text-align: center; font-size: small;">{{this.ID}}</td>
-				<td style="text-align: center; font-size: small;">{{this.ErrorName}}</td>
-				<td style="text-align: center; font-size: small;">{{this.Value}}</td>
+				<td style="text-align: center;">{{this.ErrorID}}</td>
+				<td style="text-align: center;">{{this.Section}}</td>
+				<td style="text-align: center;">{{this.Error}}</td>
+				<td style="text-align: center;">{{this.Value}}</td>
 				<td>{{this.Desc}}</td>
 			</tr>
 				{{/each}}

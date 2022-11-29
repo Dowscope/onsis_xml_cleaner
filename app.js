@@ -172,7 +172,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
-    '328310867'
   ]
 
   // Students should be UPDATE
@@ -186,7 +185,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong postal code.
   const student_postal_fixes = [
-    '360547103'
   ]
 
   // Students class start date removed when ACTION is update

@@ -32,39 +32,47 @@ for (r in rows){
     if (r > 9){
         var columns = rows[r].split(',')
         if (columns[1]){
-            columns[1] = columns[1].replaceAll(' ', '').replaceAll('"', '')
+            columns[1] = columns[1].replaceAll(' ', '').replaceAll('"', '').trim()
             if (columns[1].length < 9){
                 columns[1] = '0' + columns[1]
             }
         }
 
+        if (columns[2]){
+            columns[2] = columns[2].toUpperCase()
+        }
+
+        if (columns[3]){
+            columns[3] = columns[3].toUpperCase()
+        }
+
         if (columns[4]){
-            var dob = columns[4].split('/')
-            var mm = dob[0]
-            var dd = dob[1]
-            var yy = dob[2]
+            var dob = columns[4].split('-')
+            var mm = dob[1]
+            var dd = dob[2]
+            var yy = dob[0]
             
-            if (dd < 10) {
-                dd = '0' + dd
-            }
-            if (mm < 10) {
-                mm = '0' + mm
-            }
+            // if (dd < 10) {
+            //     dd = '0' + dd
+            // }
+            // if (mm < 10) {
+            //     mm = '0' + mm
+            // }
             columns[4] = yy + '/' + mm + '/' + dd
         }
 
         if (columns[9]){
-            var dob = columns[9].split('/')
-            var mm = dob[0]
-            var dd = dob[1]
-            var yy = dob[2]
+            var dob = columns[9].split('-')
+            var mm = dob[1]
+            var dd = dob[2]
+            var yy = dob[0]
             
-            if (dd < 10) {
-                dd = '0' + dd
-            }
-            if (mm < 10) {
-                mm = '0' + mm
-            }
+            // if (dd < 10) {
+            //     dd = '0' + dd
+            // }
+            // if (mm < 10) {
+            //     mm = '0' + mm
+            // }
             columns[9] = yy + '/' + mm + '/' + dd
         }
 
