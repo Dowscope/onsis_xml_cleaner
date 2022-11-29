@@ -39,10 +39,12 @@ for (r in rows){
         }
 
         if (columns[2]){
+            columns[2] = columns[2].replaceAll(' ', '').replaceAll('"', '').trim()
             columns[2] = columns[2].toUpperCase()
         }
 
         if (columns[3]){
+            columns[3] = columns[3].replaceAll(' ', '').replaceAll('"', '').trim()
             columns[3] = columns[3].toUpperCase()
         }
 
