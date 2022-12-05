@@ -171,7 +171,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   ]
 
   // Students that have a wrong exit code.
-  const student_exit_fixes = [
+  const student_exit_fixes = [ 
+    
   ]
 
   // Students should be UPDATE
