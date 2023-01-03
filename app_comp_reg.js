@@ -5,7 +5,7 @@
 // Get command line arguments
 const arg = process.argv.slice(2)
 
-if (arg.length > 5){
+if (arg.length!= 3){
   console.log('File Path, OnSIS Extract FileName, PS Extract FileName.  ie. c:\\onsis\\ algo_se.csv algo_ps.csv')
   process.exit(0)
 }
@@ -37,9 +37,10 @@ for (var row in onsis_rows){
         columns[9] = columns[9].replaceAll('"','')
         columns[16] = columns[16].replaceAll('"', '').replaceAll(' ','')
         columns[10] = columns[10].replaceAll('"', '').replaceAll(' ','')
+        columns[28] = columns[28].replaceAll('"', '').replaceAll(' ','')
         // check for exited students
         if (columns[16] == '' && columns[10] == 'FT'){
-            onsis_students.push([columns[1], columns[8]])
+            onsis_students.push([columns[28], columns[8]])
         }
     }
 }
@@ -48,15 +49,11 @@ onsis_og_count = onsis_students.length
 // Collect all the students reported in PowerSchool Report
 for (var row in ps_rows) {
     const columns = ps_rows[row].split(',')
-    if (columns[0] && columns[0].slice(0,3) != 'OEN') {
+    if (columns[0]) {
         columns[0] = columns[0].replaceAll('"','')
-        columns[0] = columns[0].slice(0,9)
-        columns[14] = columns[14].replaceAll('"','')
-        columns[31] = columns[31].replaceAll('"','')
-        // console.log(columns)
         
-        if (parseInt(columns[32])>210){
-            ps_students.push([columns[0], columns[14]])
+        if (parseInt(columns[1])>0){
+            ps_students.push([columns[0], 0])
         }
     }
 }

@@ -155,11 +155,155 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const class_segment_fix = [
   ]
 
+  // Classes that shouldn't be in the XML, they are last years classes
+  const class_lastyears_fix = [
+    'ADA1O1-02',
+    'ADA3M/4M1-01',
+    'ADA3M/4M1-02',
+    'ALP1X1-2-C',
+    'AMG2O1/2OR-01',
+    'AMI1O1-01',
+    'AMI2O/3M/4M-01',
+    'AVI1O/2O1-03',
+    'AVI1O/2O1-04',
+    'BBB4M1-01',
+    'BBB4M9-1-C',
+    'BBI2O1-01',
+    'BBI2O9-3-C',
+    'BMI3C1-01',
+    'BTT1O1-01',
+    'CGC1D1-01',
+    'CGC1DF-01',
+    'CGC1P1-02',
+    'CGC1P9-3-C',
+    'CHC2D1-01',
+    'CHC2D1-02',
+    'CHC2DF-02',
+    'CHC2P1-01',
+    'CHC2P1-02',
+    'CHV2O5-05',
+    'CHV2OE-02',
+    'CHV2OF-02',
+    'CLN4C/4U1-02',
+    'CLN4UC-1-C',
+    'CLU3M/MS1-01',
+    'CLU3M/MS1-02',
+   ' COOPS2AM',
+   ' COOPS2PM',
+    'ENG1D1-02',
+    'ENG1P1-03',
+    'ENG2D1-01',
+    'ENG2D1-04',
+    'ENG2D1-05',
+    'ENG2P1-01',
+    'ENG3C1-02',
+    'ENG3C1-03',
+    'ENG3UA-02',
+    'ENG4C1-01',
+    'ENG4E/OLC4O1-01',
+    'ENG4U1-01',
+    'ENG4U1-03',
+    'ENG4UA-01',
+    'FIF1D1-01',
+    'FIF2D1-01',
+    'FIF3U1-01',
+    'FIF4U1/4UA-02',
+    'FSF1D1-02',
+    'FSF1P1-01',
+    'FSF1P1-02',
+    'GLS1O1-3-C',
+    'HFA4C/4U1-01',
+    'HFC3E1-03',
+    'HFC3E1-04',
+    'HFN2O/HFC3MF-01',
+    'HFN2O/HFC3MF-03',
+    'HPC3O1-01',
+    'HSP3U1-01',
+    'HSP3UF-01',
+    'ICS3U/4U1-01',
+    'LNOAO1-02',
+    'MAP4C1-02',
+    'MAT1L/2L1-01',
+    'MAT1LZ-1-C',
+    'MBF3C1-03',
+    'MCR3U1-03',
+    'MCV4U1-02',
+    'MDM4U1-01',
+    'MDM4U1-02',
+    'MFM2P1-02',
+    'MFM2P1-03',
+    'MHF4U1-03',
+    'MPM2D1-03',
+    'MPM2D1-04',
+    'MTH1W1-01',
+    'MTH1W1-02',
+    'MTH1W1-04',
+    'MTH1WA-01',
+    'NAC1O1-01',
+    'NAC2O1-01',
+    'NBE3U1-02',
+    'NBE3U1-03',
+    'PAF3O1-02',
+    'PAF4O1-01',
+    'PPL1OF-02',
+    'PPL1OX-01',
+    'PPL1OY-01',
+    'PPL2OX/2OY-01',
+    'PPL3O/4O1-02',
+    'PPL3O/4O1-04',
+    'PPL3OZ-01',
+    'PSK4U1-01',
+    'PWPGLD-01',
+    'PWPMATH-01',
+    'PWPPAI-02',
+    'SBI3U1-01',
+    'SBI3U1-03',
+    'SBI4U1-01',
+    'SCH4C1-01',
+    'SCH4U1-01',
+    'SNC1D1-01',
+    'SNC1D1-02',
+    'SNC1D1-04',
+    'SNC1L1-01',
+    'SNC1P1-02',
+    'SNC1P1-03',
+    'SNC2D1-01',
+    'SNC2D1-04',
+    'SNC2P1-01',
+    'SP/NEEDS_S2P1_A',
+    'SP/NEEDS_S2P1_B',
+    'SP/NEEDS_S2P2_A',
+    'SP/NEEDS_S2P2_B',
+    'SP/NEEDS_S2P4_A',
+    'SP/NEEDS_S2P4_B',
+    'SP/NEEDS_S2P5_A',
+    'SP/NEEDS_S2P5_B',
+    'SPH3U1-02',
+    'SVN3E1-02',
+    'TCJ3C/E/4C/E-02',
+    'TCJ3C/E/4C/E-03',
+    'TEJ2O1-01',
+    'TIJ1O1-03',
+    'TMJ2O1/3C1-02',
+    'TMJ3E/4C/4E1-02',
+    'TTA3C2-01',
+    'TTJ2O1-01',
+    'TTL4C2-01',
+    'TWJ3E/4E1-01',
+    'TWJ3E/4E1-03',
+    'TXJ2O/3E/4E1-02',
+    'TXJ2O/3E/4E1-03'
+  ]
   
 
   // Manual Student Changes - Student Number --------------------------
   // Students with IA codes.
   const student_ia_fixes = [
+    '359124043',
+    '359125182',
+    '359125365',
+    '359125375',
+    '359125789',
   ]
 
 
@@ -173,6 +317,28 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong exit code.
   const student_exit_fixes = [
+    '330229451',
+    '330229642',
+    '330230053',
+    '330230327',
+    '330232943',
+    '330232968',
+    '330233255',
+    '330233289',
+    '330234824',
+    '330237728',
+    '330240391',
+    '330240425',
+    '330276916',
+    '330296401',
+    '330297292',
+    '330348384',
+    '330376336',
+    '359042330',
+    '359118312',
+    '359118486',
+    '359123609',
+    '359123722',
   ]
 
   // Students should be UPDATE
@@ -186,7 +352,6 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   // Students that have a wrong postal code.
   const student_postal_fixes = [
-    '359116539'
   ]
 
   // Students class start date removed when ACTION is update
@@ -212,12 +377,133 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
   const crs_ind_code = 'SAM'
   const crs_ind_change = '3'
 
-  // Students shoulg have a status of ADD not UPDATE
+  // Students should have a status of ADD not UPDATE
   const student_status_fix = [
   ]
   
   // Change the student special ed status from UPDATE to ADD. or ADD to UPDATE 
   const manual_speced_status_fix = [
+    '330232265',
+    '330237264',
+    '330242108',
+    '330249657',
+    '330251448',
+    '330252115',
+    '330252495',
+    '330253980',
+    '330254814',
+    '330254889',
+    '330255530',
+    '330257205',
+    '330258435',
+    '330259656',
+    '330262981',
+    '330263906',
+    '330264375',
+    '330265588',
+    '330267527',
+    '330271461',
+    '330272352',
+    '330272600',
+    '330275017',
+    '330275199',
+    '330275751',
+    '330276122',
+    '330276726',
+    '330277179',
+    '330277567',
+    '330277997',
+    '330278508',
+    '330282153',
+    '330286147',
+    '330286501',
+    '330287533',
+    '330287988',
+    '330288820',
+    '330294273',
+    '330294869',
+    '330294927',
+    '330295031',
+    '330295544',
+    '330296708',
+    '330296864',
+    '330298001',
+    '330298084',
+    '330298100',
+    '330298209',
+    '330298217',
+    '330298878',
+    '330299066',
+    '330299561',
+    '330301250',
+    '330301805',
+    '330301953',
+    '330302159',
+    '330304916',
+    '330305509',
+    '330305608',
+    '330305848',
+    '330305954',
+    '330306556',
+    '330307034',
+    '330316746',
+    '330317926',
+    '330319476',
+    '330321282',
+    '330324203',
+    '330326091',
+    '330328501',
+    '328790316',
+    '330334087',
+    '330334129',
+    '330339979',
+    '330341058',
+    '330341058',
+    '330341058',
+    '330342395',
+    '330346016',
+    '330347881',
+    '330349226',
+    '330356601',
+    '330359936',
+    '330361007',
+    '330361700',
+    '330365768',
+    '330372061',
+    '330372079',
+    '359000023',
+    '359011442',
+    '359012127',
+    '359012341',
+    '359012556',
+    '359012887',
+    '359013026',
+    '359031077',
+    '359031093',
+    '359032257',
+    '359033123',
+    '359037090',
+    '359037678',
+    '359055118',
+    '359076833',
+    '359079381',
+    '359080470',
+    '359089430',
+    '359090081',
+    '359094638',
+    '359095171',
+    '359100203',
+    '359100344',
+    '330197427',
+    '330211426',
+    '330216896',
+    '359116654',
+    '359123143',
+    '359123420',
+    '359123460',
+    '359123487',
+    '359123513',
+    '359123582',
   ]
 
   // SHSM should be an ADD status
@@ -255,10 +541,86 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
 
   const class_codes = []
 
+  // Classes from last year need to be removed
+  for (var c = 0; c < classes.length; c++ ) {
+    for (var cly of class_lastyears_fix){
+      if (cly == classes[c].CLASS_CODE._text){
+        delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c]
+        classes.splice(c,1)
+        c--
+        break;
+      }
+    }
+  }
+  for (var e = 0; e < educators.length; e++){
+    if (educators[e].CLASS_ASSIGNMENT){
+      if (Array.isArray(educators[e].CLASS_ASSIGNMENT)){
+        for (var ca = 0; ca < educators[e].CLASS_ASSIGNMENT.length; ca++){
+          if (sub_month == 'OCT' && educators[e].CLASS_ASSIGNMENT[ca].ACTION._text == 'DELETE'){
+            delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CLASS_ASSIGNMENT[ca]
+            educators[e].CLASS_ASSIGNMENT.splice(ca, 1)
+            ca--
+          }
+        }
+      }
+      else {
+        if (sub_month == 'OCT' && educators[e].CLASS_ASSIGNMENT.ACTION._text == 'DELETE'){
+          delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.SCHOOL_EDUCATOR_ASSIGNMENT[e].CLASS_ASSIGNMENT
+          delete educators[e].CLASS_ASSIGNMENT
+        }
+      }
+    }
+  }
+  for (var s = 0; s < students.length; s++){
+    if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
+      if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
+        for (var ce = 0; ce < students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.length; ce++){
+          for (var cly of class_lastyears_fix){
+            if (sub_month == 'OCT' && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce].CLASS_CODE._text == cly){
+              delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[ce]
+              students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.splice(ce, 1)
+              ce--
+              break;
+            }
+          }
+        }
+      }
+      else {
+        for (var cly of class_lastyears_fix){
+          if (sub_month == 'OCT' && students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT.CLASS_CODE._text == cly){
+            delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT
+            delete students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT
+            break
+          }
+        }
+      }
+    }
+
+    if (students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM){
+      if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM)){
+        for (var ce = 0; ce < students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.length; ce++){
+          if (sub_month == 'OCT' && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[ce].ACTION._text == 'DELETE'){
+            delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM[ce]
+            students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.splice(ce, 1)
+            ce--
+          }
+        }
+      }
+      else {
+        if (sub_month == 'OCT' && students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM.ACTION._text == 'DELETE'){
+          delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM
+          delete students[s].STUDENT_SCHOOL_ENROLMENT.SECOND_LANGUAGE_PROGRAM
+        }
+      }
+    }
+  }
+
   // Loop through all the classes
   for (var c = 0; c < classes.length; c++ ){
 
     // Manual Changes ----------------------
+    
+    
     // Classes missing segments
     for (var cfs of class_segment_fix){
       if (cfs[0] == classes[c].CLASS_CODE._text){
@@ -305,6 +667,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
         }
       }
     }
+
+    
 
     var valid = true
     for (code of class_codes){
@@ -369,6 +733,8 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
                   segs.push(classes[c].SEGMENT)
                 }
 
+                console.log(classes[index])
+                console.log(jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index])
                 jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[index].SEGMENT = segs
               }
             }
@@ -377,11 +743,13 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
           delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c]
           classes.splice(c,1)
           c--
+          break
         }
         else {
           delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c]
           classes.splice(c,1)
           c--
+          break
         }
         class_duplicate_counter += 1
         valid = false
@@ -406,12 +774,16 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
       // Classtype not needed when ACTION is UPDATE
       if (classes[c].ACTION._text == 'UPDATE' && classes[c].CLASS_TYPE){
         delete jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].CLASS_TYPE
+        classes.splice(c,1)
+        c--
         class_type_counter += 1
+        continue
       }
 
       class_codes.push({'code':classes[c].CLASS_CODE._text, 'index':c, 'segment':hasSegment})
     }
 
+    
     // Automatic -----------------------------
     if (sub_month == 'MAR'){
       // Change the status from ADD to UPDATE
@@ -440,13 +812,15 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
     if (classes[c].SEGMENT){
       if (Array.isArray(classes[c].SEGMENT)){
         for (var o in classes[c].SEGMENT){
-          if (classes[c].SEGMENT[o].MINISTRY_DFND_CRS && classes[c].SEGMENT[o].MINISTRY_DFND_CRS._text){
+          if (classes[c].SEGMENT[o] && classes[c].SEGMENT[o].MINISTRY_DFND_CRS && classes[c].SEGMENT[o].MINISTRY_DFND_CRS._text){
             const crsCode = classes[c].SEGMENT[o].MINISTRY_DFND_CRS._text
             if ( crsCode.slice(-1) == 'L'){
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].MINISTRY_DFND_CRS._text = ''
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].LOCAL_DEV_CRS._text = crsCode
             }
             if (crsCode.length > 5){
+              console.log(classes[c].SEGMENT[o])
+              console.log(jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c])
               jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.CLASS[c].SEGMENT[o].MINISTRY_DFND_CRS._text = crsCode.slice(0, 5)
             }
           }
@@ -503,7 +877,7 @@ fs.readFile(filePath, 'utf-8', (err, data)=> {
             if (Array.isArray(students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT)){
               for (c in students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT){
                 if (students[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].ACTION._text == 'UPDATE'){
-                  jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].ACTION._text = 'ADD'
+                  //jsonData.ONSIS_BATCH_FILE.DATA.SCHOOL_SUBMISSION.SCHOOL.STUDENT[s].STUDENT_SCHOOL_ENROLMENT.STUDENT_CLASS_ENROLMENT[c].ACTION._text = 'ADD'
                 }
               }
             }
